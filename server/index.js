@@ -2,10 +2,11 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const morgan = require("morgan");
+const passport = require("passport");
+const bodyParser = require("body-parser");
 
 dotenv.config();
 
@@ -14,6 +15,8 @@ const {
   notFoundHandler,
   errorHandler,
 } = require("./middlewares/common/errorHandler");
+
+const PORT = process.env.PORT || 5000;
 
 mongoose.set("strictQuery", false);
 
@@ -25,11 +28,21 @@ mongoose
   })
   .then(() => console.log("Connected to DB!"))
   .catch((err) => console.log(err));
+
+// use middlewares
 app.use(cors());
 app.use(morgan("dev"));
-// request parser
+app.use("/assets/userFiles", express.static(__dirname + "/assets/userFiles"));
+app.use(
+  "/assets/userAvatars",
+  express.static(__dirname + "/assets/userAvatars")
+);
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(passport.initialize());
+require("./config/passport.js");
 
 // user routes
 const userRouter = require("./routes/userRouter");
@@ -39,12 +52,8 @@ app.use("/users", userRouter);
 const postRouter = require("./routes/postRouter");
 app.use("/posts", postRouter);
 
-//body parser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-//parse cookies
-app.use(cookieParser(process.env.COOKIE_SECRET));
+const communityRouter = require("./routes/communityRouter");
+app.use("/communities", communityRouter);
 
 // 404 error handling
 app.use(notFoundHandler);
@@ -52,8 +61,4 @@ app.use(notFoundHandler);
 //error handling
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () =>
-  console.log(`Server up and running on port ${process.env.PORT}!`)
-);
-
-
+app.listen(PORT, () => console.log(`Server up and running on port ${PORT}!`));
