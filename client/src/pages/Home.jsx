@@ -3,23 +3,19 @@ import Leftbar from "../components/home/LeftBar";
 import MainSection from "../components/home/MainSection";
 import Rightbar from "../components/home/RightBar";
 
+import Navbar from "../components/home/Navbar";
 const Home = () => {
   return (
-    <div className="flex justify-center">
-      <div className="max-w-7xl w-full">
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-2">
-            <Leftbar />
-          </div>
-          <div className="col-span-8">
-            <MainSection />
-          </div>
-          <div className="col-span-2">
-            <Rightbar />
-          </div>
-        </div>
-      </div>
+    <div className="bg-[#f6fbff]">
+  
+      <Navbar/>
+     <div className="flex lg:px-48 mx-auto bg-[#f6fbff]">
+      <Leftbar />
+      <MainSection />
+      <Rightbar />
     </div>
+    </div>
+   
   );
 };
 

@@ -1,96 +1,138 @@
-import React from 'react'
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
-import {FcGoogle} from 'react-icons/fc'
-import SignUp from './SignUp';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signInAction } from "../../redux/actions/authActions";
+import LoadingSpinner from "../spinner/LoadingSpinner";
+
 const SignIn = () => {
-    let [isOpen, setIsOpen] = useState(false);
-    function closeModal() {
-        setIsOpen(false);
-      
-      }
-    
-      function openModal() {
-        setIsOpen(true);
-       
-      }
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleSubmit = async (event) => {
+    setLoading(true);
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+    await dispatch(signInAction(formData, navigate));
+    setLoading(false);
+  };
+
+  const signInerror = useSelector((state) => state.auth?.signInerror);
+  const successMessage = useSelector((state) => state.auth?.successMessage);
+
   return (
-    <div>
-    <section className="w-96">
-<div className="flex flex-col items-center justify-center px-2 py-3 mx-auto  lg:py-0">
- 
-  <div className="w-full ">
-      <div className="p-6 space-y-4 ">
-        
-          <form className="space-y-4 md:space-y-6" action="#">
-              <div>
-                  <label for="email" className="block mb-2 text-sm font-medium text-gray-900 ">Your email</label>
-                  <input type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 " placeholder="name@company.com" required=""/>
-              </div>
-              <div>
-                  <label for="password" className="block mb-2 text-sm font-medium text-gray-900 ">Password</label>
-                  <input type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 " required=""/>
-              </div>
-              <div className="flex items-center justify-between">
-                  <div className="flex items-start">
-                      <div className="flex items-center h-5">
-                        <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required=""/>
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label for="remember" className="text-gray-500 dark:text-gray-300">Remember me</label>
-                      </div>
-                  </div>
-                  <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</a>
-              </div>
-              <button type="submit" className="w-full text-white bg-primary hover:bg-primary-200 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ">Sign in</button>
-              <h1 className=" flex items-center justify-center cursor-pointer gap-4 text-lg border border-gray-400 rounded-full hover:bg-primary hover:text-white px-4 py-2">
-             <FcGoogle/> Continue in with Google
-          </h1>
-              <button onClick={openModal} className="text-sm font-light text-gray-500 dark:text-gray-400">
-                  Don’t have an account yet? <a href="#" className="font-medium text-primary hover:underline dark:text-primary">Sign up</a>
-              </button>
-          </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to your account
+          </h2>
+        </div>
+        {signInerror && (
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <strong className="font-bold">Error! </strong>
+            <span className="block sm:inline">{signInerror}</span>
+          </div>
+        )}
 
-          <Transition appear show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={closeModal}>
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-              >
-                <div className="fixed inset-0 bg-black bg-opacity-25" />
-              </Transition.Child>
+        {successMessage && (
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <strong className="font-bold">Success! </strong>
+            <span className="block sm:inline">{successMessage}</span>
+          </div>
+        )}
 
-              <div className="fixed inset-0 overflow-y-auto">
-                <div className="flex min-h-full items-center justify-center p-4 text-center">
-                  <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0 scale-95"
-                    enterTo="opacity-100 scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 scale-100"
-                    leaveTo="opacity-0 scale-95"
-                  >
-                    <Dialog.Panel className="w-full max-w-md flex justify-center items-center transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                     <SignUp/>
-                   
-                    </Dialog.Panel>
-                  </Transition.Child>
-                </div>
-              </div>
-            </Dialog>
-          </Transition>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <input type="hidden" name="remember" value="true" />
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="email-address" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              disabled={loading}
+              cursor={loading ? "not-allowed" : "pointer"}
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                <svg
+                  className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 3a1 1 0 011 1v1.586l3.707-3.707a1 1 0 011.414 1.414L12.414 7H14a7 7 0 017 7v2a1 1 0 01-2 0v-2a5 5 0 00-5-5H12.414l2.293-2.293a1 1 0 011.414 1.414L12 9.586V11a1 1 0 01-2 0V4a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </span>
+
+              {loading ? (
+                <LoadingSpinner loadingText={"Signing In..."} />
+              ) : (
+                "Sign In"
+              )}
+            </button>
+          </div>
+        </form>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account ?{" "}
+            <Link
+              to="/signup"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Sign Up
+            </Link>
+          </p>
+        </div>
       </div>
-  </div>
-</div>
-</section>
-</div>
-  )
-}
+    </div>
+  );
+};
 
-export default SignIn
+export default SignIn;

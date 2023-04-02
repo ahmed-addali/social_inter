@@ -7,13 +7,14 @@ const communitySchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
     description: {
       type: String,
       required: true,
       trim: true,
     },
-    image: {
+    banner: {
       type: String,
     },
 
@@ -21,27 +22,49 @@ const communitySchema = new Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default: [],
       },
     ],
-    guidelines: {
-      type: String,
-    },
+
     members: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default: [],
       },
     ],
-    // admin: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "User",
-    //   required: true,
-    // },
 
+    bannedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
     posts: [
       {
         type: Schema.Types.ObjectId,
         ref: "Post",
+      },
+    ],
+
+    reportedPosts: {
+      type: [
+        {
+          post: { type: mongoose.Schema.Types.ObjectId, ref: "Post" },
+          reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+          reportReason: { type: String },
+          reportDate: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
+
+    rules: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ModerationRule",
+        unique: true,
       },
     ],
   },
@@ -50,6 +73,15 @@ const communitySchema = new Schema(
   }
 );
 
+communitySchema.pre("remove", async function (next) {
+  try {
+    const postIds = this.posts.map((post) => post.toString());
+    await this.model("Post").deleteMany({ _id: { $in: postIds } });
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 const Community = mongoose.model("Community", communitySchema);
 
 module.exports = Community;

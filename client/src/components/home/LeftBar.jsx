@@ -1,142 +1,91 @@
-import React from 'react'
-import {FaHatWizard} from 'react-icons/fa'
-import {BiHomeCircle} from 'react-icons/bi'
-import {CgCommunity} from 'react-icons/cg'
-import {CgProfile} from 'react-icons/cg'
-import {HiHashtag} from 'react-icons/hi'
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import React, { useMemo, memo } from "react";
 import { Link } from "react-router-dom";
-import SignIn from '../auth/SignIn'
-import rownok from '../../assets/rownok.png'
-import PostCreate from '../auth/PostCreate'
-
+import { useSelector, useDispatch } from "react-redux";
+import { logoutAction } from "../../redux/actions/authActions";
+import { useEffect } from "react";
+import { getJoinedCommunitiesAction } from "../../redux/actions/communityActions";
+import avater from '../../assets/rownok.jpg'
+import {BsThreeDots} from 'react-icons/bs'
 const Leftbar = () => {
-  let [isOpen, setIsOpen] = useState(false);
-  let [isSignUp, setSignUp] = useState(false);
-  function closeSign() {
-    setSignUp(false);
-  
-  }
+  const dispatch = useDispatch();
+  const logout = () => {
+    dispatch(logoutAction());
+  };
+  const user = useSelector((state) => state.auth?.userData);
+  const joinedCommunities = useSelector(
+    (state) => state.community?.joinedCommunities
+  );
 
-  function openSign() {
-    setSignUp(true);
-   
-  }
-  function closeModal() {
-      setIsOpen(false);
-    
-    }
-  
-    function openModal() {
-      setIsOpen(true);
-     
-    }
+  useEffect(() => {
+    dispatch(getJoinedCommunitiesAction());
+  }, [dispatch]);
+
+  const visibleCommunities = useMemo(() => {
+    return joinedCommunities?.slice(0, 5);
+  }, [joinedCommunities]);
+
+  const communityLinks = useMemo(() => {
+    return visibleCommunities?.map((community) => ({
+      href: `/community/${community.name}`,
+      label: community.name,
+    }));
+  }, [visibleCommunities]);
+
   return (
-    <div className='relative'>
-    <div className='flex flex-col justify-start mt-10 h-[650px] sticky left-0 top-0 items-start gap-7'>
-       <FaHatWizard className='text-3xl'/>
-       <Link to='/' className="flex items-center gap-2 cursor-pointer">
-           <BiHomeCircle className='text-3xl'/>
-           <p className='text-xl font-bold'>Home</p>
-       </Link>
-       <Link to='/community' className="flex items-center gap-2 cursor-pointer">
-           <CgCommunity className='text-3xl'/>
-           <p className='text-xl font-bold'>Community</p>
-       </Link>
-       <Link to='/profile' className="flex items-center gap-2 cursor-pointer">
-           <CgProfile className='text-3xl'/>
-           <p className='text-xl font-bold'>Profile</p>
-       </Link>
-       <div className="flex items-center gap-2 cursor-pointer">
-           <HiHashtag className='text-3xl'/>
-           <p className='text-xl font-bold'>Explore</p>
-       </div>
-       <button className='btn btn-primary rounded-full' onClick={openModal}>Create Post</button>
-       <Transition appear show={isOpen} as={Fragment}>
-           <Dialog as="div" className="relative z-10" onClose={closeModal}>
-             <Transition.Child
-               as={Fragment}
-               enter="ease-out duration-300"
-               enterFrom="opacity-0"
-               enterTo="opacity-100"
-               leave="ease-in duration-200"
-               leaveFrom="opacity-100"
-               leaveTo="opacity-0"
-             >
-               <div className="fixed inset-0 bg-black bg-opacity-25" />
-             </Transition.Child>
+    <div className="w-3/12 h-[84vh] bg-white sticky top-24 left-0 shadow-2xl shadow-[#F3F8FF] px-6 py-6 my-5 rounded-lg">
+      <div className="flex flex-col h-full justify-between">
+        <div className="flex gap-2 justify-between">
+         <img className="rounded-full w-10" src={avater} alt="user" />
+            {user && <p className="font-bold text-blue-500 capitalize text-sm">{user.name}</p>}
+            <BsThreeDots className="cursor-pointer"/>
+        </div>
+        <div className="flex flex-col items-start">
+          <Link to="/home">Home</Link>
+          <Link to="/profile">Profile</Link>
+          <Link to="/saved">Saved</Link>
 
-             <div className="fixed inset-0 overflow-y-auto">
-               <div className="flex min-h-full items-center justify-center p-4 text-center">
-                 <Transition.Child
-                   as={Fragment}
-                   enter="ease-out duration-300"
-                   enterFrom="opacity-0 scale-95"
-                   enterTo="opacity-100 scale-100"
-                   leave="ease-in duration-200"
-                   leaveFrom="opacity-100 scale-100"
-                   leaveTo="opacity-0 scale-95"
-                 >
-                   <Dialog.Panel className="w-full max-w-4xl flex justify-center items-center transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                    <PostCreate/>
-                  
-                   </Dialog.Panel>
-                 </Transition.Child>
-               </div>
-             </div>
-           </Dialog>
-         </Transition>
-   
-         <button  className="flex justify-between items-center absolute bottom-0 cursor-pointer" onClick={openSign}>
-           <div className="flex gap-1">
-              <img className='w-12' src={rownok} alt="" />
-              <div className="flex flex-col">
-               <p className='text-lg font-semibold capitalize'>rownok</p>
-               <p className='text-xs text-gray-500'>@rownok</p>
+          {user && user.role === "general" && (
+            <Link to="/following">Following</Link>
+          )}
+
+          {communityLinks && communityLinks.length > 0 ? (
+            <div>
+              <h3 className="mb-2">Communities you're in</h3>
+              <ul>
+                {communityLinks.map((communityLink) => (
+                  <li key={communityLink.href}>
+                    <Link to={communityLink.href}>{communityLink.label}</Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div>
+                <Link to="/my-communities">
+                  See all ({joinedCommunities.length})
+                </Link>
               </div>
-           </div>
-       </button>
-       <Transition appear show={isSignUp} as={Fragment}>
-           <Dialog as="div" className="relative z-10" onClose={closeSign}>
-             <Transition.Child
-               as={Fragment}
-               enter="ease-out duration-300"
-               enterFrom="opacity-0"
-               enterTo="opacity-100"
-               leave="ease-in duration-200"
-               leaveFrom="opacity-100"
-               leaveTo="opacity-0"
-             >
-               <div className="fixed inset-0 bg-black bg-opacity-25" />
-             </Transition.Child>
+            </div>
+          ) : (
+            <div>No communities found.</div>
+          )}
+        </div>
+        <div className="flex flex-col items-center justify-center">
+          <div className="flex">
+            <div>
+              <img src={user.avatar} alt="" />
+            </div>
+            <div>{user.name}</div>
+          </div>
 
-             <div className="fixed inset-0 overflow-y-auto">
-               <div className="flex min-h-full items-center justify-center p-4 text-center">
-                 <Transition.Child
-                   as={Fragment}
-                   enter="ease-out duration-300"
-                   enterFrom="opacity-0 scale-95"
-                   enterTo="opacity-100 scale-100"
-                   leave="ease-in duration-200"
-                   leaveFrom="opacity-100 scale-100"
-                   leaveTo="opacity-0 scale-95"
-                 >
-                   <Dialog.Panel className="w-full max-w-md flex justify-center items-center transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
-                   <SignIn/>
-                  
-                   </Dialog.Panel>
-                 </Transition.Child>
-               </div>
-             </div>
-           </Dialog>
-         </Transition>
-         
-       
-   </div>
-   </div>
-  
+          {user && (
+            <button onClick={logout} type="button">
+              Logout
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default Leftbar;
+export default memo(Leftbar);
