@@ -1,31 +1,30 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const fs = require("fs");
+const path = require("path");
+const { promisify } = require("util");
+
 const postSchema = new Schema(
   {
-    title: {
+    body: {
       type: String,
-      required: true,
       trim: true,
     },
-    description: {
+    fileUrl: {
       type: String,
-      required: true,
       trim: true,
     },
-    image: {
-      type: String,
-    },
-    video: {
-      type: String,
-    },
+
     community: {
       type: Schema.Types.ObjectId,
       ref: "Community",
+      required: true,
     },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     comments: [
       {
@@ -40,23 +39,59 @@ const postSchema = new Schema(
         ref: "User",
       },
     ],
-
-    likeCount: {
-      type: Number,
-      default: 0,
-    },
-
-    dislikes: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
   },
   {
     timestamps: true,
   }
 );
+
+postSchema.pre("remove", async function (next) {
+  try {
+    if (this.fileUrl) {
+      const filename = path.basename(this.fileUrl);
+      console.log(filename);
+      const deleteFilePromise = promisify(fs.unlink)(
+        path.join(__dirname, "../assets/userFiles", filename)
+      );
+      console.log(path.join(__dirname, "../assets/userFiles", filename));
+      await deleteFilePromise;
+    }
+    const commentIds = this.comments.map((comment) => comment.toString());
+    await this.model("Comment").deleteMany({
+      _id: {
+        $in: commentIds,
+      },
+    });
+    // Delete the reported post-entry from all communities
+    await this.model("Community").updateMany(
+      {
+        "reportedPosts.post": this._id,
+      },
+      {
+        $pull: {
+          reportedPosts: {
+            post: this._id,
+          },
+        },
+      }
+    );
+
+    // Delete the saved post-entry from all users
+    await this.model("User").updateMany(
+      {
+        savedPosts: this._id,
+      },
+      {
+        $pull: {
+          savedPosts: this._id,
+        },
+      }
+    );
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 const Post = mongoose.model("Post", postSchema);
 
