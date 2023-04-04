@@ -1,38 +1,105 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import LeaveModal from "../modals/LeaveModal";
+import { getCommunityAction } from "../../redux/actions/communityActions";
+import placeholder from "../../assets/placeholder.png";
+
+import {
+  useBannerLoading,
+  useIsModeratorUpdated,
+} from "../../hooks/useCommunityData";
 
 const RightBar = () => {
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const dispatch = useDispatch();
+  const { communityName } = useParams();
+
+  const toggleLeaveModal = () => {
+    setShowLeaveModal(!showLeaveModal);
+  };
+
+  useEffect(() => {
+    dispatch(getCommunityAction(communityName));
+  }, [dispatch, communityName]);
+
+  const communityData = useSelector((state) => state.community?.communityData);
+  const isModerator = useSelector((state) => state.auth?.isModerator);
+
+  const { name, description, members, rules, banner } = useMemo(
+    () => communityData || {},
+    [communityData]
+  );
+
+  const bannerLoaded = useBannerLoading(banner);
+  const isModeratorUpdated = useIsModeratorUpdated(isModerator);
+
+  if (!communityData) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="w-1/4 p-4">
-      <div className="bg-white rounded-md shadow-md p-4">
-        <h2>A banner goes here</h2>
-        <h2 className="text-lg font-bold mb-4">Community Name</h2>
-        <h3>Brief Bio here</h3>
+    <div className="w-1/4 p-4 h-screen bg-white sticky top-0">
+      <div className="bg-white rounded-md  p-4">
+        {bannerLoaded ? (
+          <img
+            src={banner}
+            alt="community banner"
+            className="w-full h-40 rounded-md object-cover mb-4"
+            onError={(e) => {
+              e.target.src = placeholder;
+            }}
+          />
+        ) : (
+          <img
+            src={placeholder}
+            alt="community banner placeholder"
+            className="w-full h-40 rounded-md object-cover mb-4"
+          />
+        )}
+
+        <h2 className="text-lg font-bold mb-4">{name}</h2>
+        <h3>{description}</h3>
         <div className="flex items-center text-gray-500 mb-4">
-          <span className="mr-2">24,567</span>
+          <span className="mr-2">{members?.length || 0}</span>
           joined members
         </div>
         <div>
-          {/*  a community moderation panel link
-           */}
+          {isModerator && (
+            <Link
+              to={`/community/${communityName}/moderator`}
+              className="text-blue-500"
+            >
+              Moderation Panel
+            </Link>
+          )}
 
-          <Link to="/community/moderator" className="text-blue-500">
-            Community Settings (available to moderators only)
-          </Link>
+          {isModeratorUpdated && !isModerator && (
+            <button
+              onClick={toggleLeaveModal}
+              className="text-white btn-primary btn-sm"
+            >
+              Leave Community
+            </button>
+          )}
+          {
+            <LeaveModal
+              show={showLeaveModal}
+              toggle={toggleLeaveModal}
+              communityName={communityName}
+            />
+          }
         </div>
-
-        <div className="text-gray-500 mb-4">
-          <span className="font-bold">Moderators:</span> Alice, Bob, Charlie
-        </div>
-        <div className="text-gray-500 mb-4">
-          <span className="font-bold">Community Guidelines:</span>
-
-          <ul className="list-disc list-inside">
-            <li>Be nice</li>
-            <li>Be respectful</li>
-            <li>Be kind</li>
-          </ul>
-        </div>
+        {rules && rules.length > 0 && (
+          <div className="text-gray-500 mb-4">
+            <span className="font-bold">Community Guidelines:</span>
+            <ul className="list-disc list-inside">
+              {rules.map((rule) => (
+                <li key={rule._id}>{rule.rule}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

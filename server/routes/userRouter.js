@@ -1,29 +1,55 @@
 const express = require("express");
 const router = express.Router();
+const passport = require("passport");
 
-// internal imports
+const {
+  getUsers,
+  addUser,
+  signin,
+  logout,
+  refreshToken,
+  getModProfile,
+  getUser,
+  updateInfo,
+} = require("../controllers/userController");
 
-const { getUsers, addUser } = require("../controllers/userController");
+const {
+  getPublicUsers,
+  followUser,
+  getPublicUser,
+  unfollowUser,
+  getFollowingUsers,
+} = require("../controllers/profileController");
 
 const {
   addUserValidator,
   addUserValidatorHandler,
 } = require("../middlewares/users/usersValidator");
+
 const avatarUpload = require("../middlewares/users/avatarUpload");
 
-//get all users
-router.get("/", getUsers);
+const requireAuth = passport.authenticate("jwt", { session: false });
 
-//add user
+router.patch("/:id/follow", requireAuth, followUser);
+router.patch("/:id/unfollow", requireAuth, unfollowUser);
+router.get("/public-users/:id", requireAuth, getPublicUser);
+router.get("/public-users", requireAuth, getPublicUsers);
+router.get("/moderator", requireAuth, getModProfile);
+router.get("/following", requireAuth, getFollowingUsers);
+router.put("/:id", requireAuth, updateInfo);
+router.get("/:id", requireAuth, getUser);
+router.get("/", requireAuth, getUsers);
 router.post(
-  "/",
-  // avatarUpload,
+  "/signup",
+  avatarUpload,
   addUserValidator,
   addUserValidatorHandler,
   addUser
 );
 
-//get user by id
-// router.get("/:id", getUserById);
+router.post("/refresh-token", refreshToken);
+
+router.post("/signin", signin);
+router.post("/logout", logout);
 
 module.exports = router;
