@@ -69,6 +69,7 @@ const signin = async (req, res) => {
         name: existingUser.name,
         email: existingUser.email,
         role: existingUser.role,
+        avatar: existingUser.avatar,
       },
     });
   } catch (err) {
@@ -168,12 +169,13 @@ const getUser = async (req, res, next) => {
  * @param {string} req.body.email - The email of the user to be added.
  * @param {string} req.body.password - The password of the user to be added.
  * @param {Object} req.files - The files attached to the request object (for avatar).
+ * @param {Function} next - The next middleware function to call if consent is given by the user to enable context based auth.
  *
  * @returns {Object} The response object with a success message if the user is added successfully.
  *
  * @throws {Error} If an error occurs while hashing the user password, or saving the new user to the database.
  */
-const addUser = async (req, res) => {
+const addUser = async (req, res, next) => {
   let newUser;
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -196,9 +198,16 @@ const addUser = async (req, res) => {
 
   try {
     await newUser.save();
-    res.status(200).json({
-      message: "User added successfully",
-    });
+    if (newUser.isNew) {
+      throw new Error("Failed to add user");
+    }
+    if (req.body.isConsentGiven === "false") {
+      res.status(201).json({
+        message: "User added successfully",
+      });
+    } else {
+      next();
+    }
   } catch (err) {
     res.status(400).json({
       message: err.message,
