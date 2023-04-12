@@ -4,13 +4,15 @@ const jwt = require("jsonwebtoken");
 const RefreshToken = require("../models/RefreshToken");
 const Post = require("../models/Post");
 const Community = require("../models/Community");
+const UserPreference = require("../models/UserPreference");
 const { logger } = require("../utils/logger");
+const { verifyContextData } = require("./authController");
 const getUserFromToken = require("../utils/getUserFromToken");
 const dayjs = require("dayjs");
 const duration = require("dayjs/plugin/duration");
 dayjs.extend(duration);
 
-const signin = async (req, res) => {
+const signin = async (req, res, next) => {
   logger.info("User attempting to sign in");
   try {
     const { email, password } = req.body;
@@ -34,6 +36,64 @@ const signin = async (req, res) => {
       return res.status(400).json({
         message: "Invalid credentials",
       });
+    }
+
+    const isContextAuthEnabled = await UserPreference.findOne({
+      user: existingUser._id,
+      enableContextBasedAuth: true,
+    });
+
+    if (isContextAuthEnabled) {
+      const contextDataResult = await verifyContextData(req, existingUser);
+
+      if (
+        contextDataResult === "no_context_data" ||
+        contextDataResult === "error"
+      ) {
+        logger.error("Error occurred while verifying context data");
+        return res.status(500).json({
+          message: "Error occurred while verifying context data",
+        });
+      }
+
+      if (contextDataResult === "already_exists") {
+        logger.error(
+          "Multiple signin attempts detected without verifying identity."
+        );
+        return res.status(401).json({
+          message: `This account has been temporarily blocked due to suspicious login activity. We have already sent a verification email to your registered email address. 
+          Please follow the instructions in the email to verify your identity and gain access to your account.
+
+          Please note that repeated attempts to log in without verifying your identity will result in this device being permanently blocked from accessing your account.
+          
+          Thank you for your cooperation`,
+        });
+      }
+
+      if (contextDataResult.mismatchedProps) {
+        const mismatchedProps = contextDataResult.mismatchedProps;
+        const currentContextData = contextDataResult.currentContextData;
+        if (
+          mismatchedProps.some((prop) =>
+            [
+              "ip",
+              "country",
+              "city",
+              "device",
+              "deviceType",
+              "os",
+              "platform",
+              "browser",
+            ].includes(prop)
+          )
+        ) {
+          req.mismatchedProps = mismatchedProps;
+          req.currentContextData = currentContextData;
+          req.user = existingUser;
+
+          return next();
+        }
+      }
     }
 
     const payload = {
