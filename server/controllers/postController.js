@@ -2,12 +2,14 @@ const dayjs = require("dayjs");
 const relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 const getUserFromToken = require("../utils/getUserFromToken");
+const formatCreatedAt = require("../utils/timeConverter");
 
 const Post = require("../models/Post");
 const Community = require("../models/Community");
 const Comment = require("../models/Comment");
 const User = require("../models/User");
 const Relationship = require("../models/Relationship");
+const mongoose = require("mongoose");
 
 const createPost = async (req, res) => {
   try {
@@ -45,10 +47,16 @@ const createPost = async (req, res) => {
       });
     }
 
-    await newPost.save();
-    return res.status(201).json({
-      message: "Post created successfully",
-    });
+    const savedPost = await newPost.save();
+    const id = savedPost._id;
+    const post = await Post.findById(id)
+      .populate("user", "name avatar")
+      .populate("community", "name")
+      .lean();
+
+    post.createdAt = dayjs(post.createdAt).fromNow();
+
+    res.json(post);
   } catch (error) {
     return res.status(409).json({
       message: "Error creating post",
@@ -70,7 +78,13 @@ const getPost = async (req, res) => {
       });
     }
 
+    post.dateTime = formatCreatedAt(post.createdAt);
+
     post.createdAt = dayjs(post.createdAt).fromNow();
+
+    post.savedByCount = await User.countDocuments({
+      savedPosts: id,
+    });
 
     res.status(200).json(post);
   } catch (error) {
@@ -127,20 +141,21 @@ const getPosts = async (req, res) => {
       .limit(limit)
       .lean();
 
-    const formattedPosts = await Promise.all(
-      posts.map(async (post) => {
-        const savedByCount = await User.countDocuments({
-          savedPosts: post._id,
-        });
-        return {
-          ...post,
-          createdAt: dayjs(post.createdAt).fromNow(),
-          savedByCount,
-        };
-      })
-    );
+    const formattedPosts = posts.map((post) => ({
+      ...post,
+      createdAt: dayjs(post.createdAt).fromNow(),
+    }));
 
-    res.status(200).json(formattedPosts);
+    const totalPosts = await Post.countDocuments({
+      community: {
+        $in: communityIds,
+      },
+    });
+
+    res.status(200).json({
+      formattedPosts,
+      totalPosts,
+    });
   } catch (error) {
     res.status(404).json({
       message: "Posts not found",
@@ -194,20 +209,20 @@ const getCommunityPosts = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .lean();
-    const formattedPosts = await Promise.all(
-      posts.map(async (post) => {
-        const savedByCount = await User.countDocuments({
-          savedPosts: post._id,
-        });
-        return {
-          ...post,
-          createdAt: dayjs(post.createdAt).fromNow(),
-          savedByCount,
-        };
-      })
-    );
 
-    res.status(200).json(formattedPosts);
+    const formattedPosts = posts.map((post) => ({
+      ...post,
+      createdAt: dayjs(post.createdAt).fromNow(),
+    }));
+
+    const totalCommunityPosts = await Post.countDocuments({
+      community: communityId,
+    });
+
+    res.status(200).json({
+      formattedPosts,
+      totalCommunityPosts,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Server error",
@@ -223,8 +238,7 @@ const getCommunityPosts = async (req, res) => {
  *
  * @param {string} req.params.id - The ID of the community to retrieve the posts for.
  * @param {number} [req.query.limit=10] - The maximum number of posts to retrieve. Defaults to 10 if not specified.
- * @param {number} [req.query.skip=0] - The number of posts to skip before starting to retrieve them.
- * Defaults to 0 if not specified.
+ * @param {number} [req.query.skip=0] - The number of posts to skip before starting to retrieve them. Defaults to 0 if not specified.
  *
  * @throws {Error} - If an error occurs while retrieving the posts.
  *
@@ -238,6 +252,7 @@ const getFollowingUsersPosts = async (req, res) => {
     const following = await Relationship.find({
       follower: userId,
     });
+
     const followingIds = following.map(
       (relationship) => relationship.following
     );
@@ -285,7 +300,6 @@ const deletePost = async (req, res) => {
   try {
     const id = req.params.id;
     const post = await Post.findById(id);
-    if (!post) throw new Error("Post not found");
     await post.remove();
     res.status(200).json({
       message: "Post deleted successfully",
@@ -601,9 +615,63 @@ const getPublicPosts = async (req, res) => {
       .limit(10)
       .exec();
 
-    res.status(200).json(publicPosts);
+    const formattedPosts = publicPosts.map((post) => ({
+      ...post.toObject(),
+      createdAt: dayjs(post.createdAt).fromNow(),
+    }));
+
+    res.status(200).json(formattedPosts);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+const search = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+    const searchQuery = req.query.q;
+    const communities = await Community.find({ members: userId }).distinct(
+      "_id"
+    );
+    const users = await User.find(
+      { $text: { $search: searchQuery } },
+      { score: { $meta: "textScore" } }
+    )
+      .select("_id name email avatar")
+      .sort({ score: { $meta: "textScore" } })
+      .lean();
+
+    const posts = await Post.find({
+      community: { $in: communities },
+      $text: { $search: searchQuery },
+    })
+      .select("_id body community user createdAt")
+      .populate("user", "name avatar")
+      .populate("community", "name")
+      .lean();
+
+    posts.forEach((post) => {
+      post.body = post.body.substring(0, 25);
+    });
+
+    const joinedCommunity = await Community.find({
+      $text: { $search: searchQuery },
+      members: { $in: userId },
+    }).select("_id name description banner");
+
+    const community = await Community.find({
+      $text: { $search: searchQuery },
+      members: { $nin: userId },
+    }).select("_id name description banner");
+
+    res.status(200).json({ posts, users, community, joinedCommunity });
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred" });
   }
 };
 
@@ -622,4 +690,5 @@ module.exports = {
   getSavedPosts,
   getPublicPosts,
   getFollowingUsersPosts,
+  search,
 };

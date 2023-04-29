@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signInAction } from "../../redux/actions/authActions";
-import LoadingSpinner from "../spinner/LoadingSpinner";
+import LoadingSpinner from "../loader/ButtonLoadingSpinner";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ const SignIn = () => {
           </div>
         )}
         <form className="w-full max-w-md">
-          <h1 className="mt-3 text-2xl font-semibold text-gray-800 capitalize sm:text-3xl ">
+          <h1 className="mt-3 text-2xl font-semibold text-gray-800 capitalize sm:text-3xl">
             sign In
           </h1>
           <div className="relative flex items-center mt-8">
@@ -105,7 +105,7 @@ const SignIn = () => {
             <button
               disabled={loading}
               onClick={handleSubmit}
-              className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+              className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-primary rounded-lg hover:bg-primary-600 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
             >
               {loading ? (
                 <LoadingSpinner loadingText={"Signing in..."} />

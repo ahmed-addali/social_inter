@@ -1,10 +1,11 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const RefreshToken = require("../models/RefreshToken");
+const Token = require("../models/Token");
 const Post = require("../models/Post");
 const Community = require("../models/Community");
 const UserPreference = require("../models/UserPreference");
+const formatCreatedAt = require("../utils/timeConverter");
 const { logger } = require("../utils/logger");
 const { verifyContextData } = require("./authController");
 const getUserFromToken = require("../utils/getUserFromToken");
@@ -46,6 +47,14 @@ const signin = async (req, res, next) => {
     if (isContextAuthEnabled) {
       const contextDataResult = await verifyContextData(req, existingUser);
 
+      if (contextDataResult === "blocked") {
+        logger.error("User device is blocked");
+        return res.status(401).json({
+          message:
+            "You've been blocked due to suspicious login activity. Please contact support for assistance.",
+        });
+      }
+
       if (
         contextDataResult === "no_context_data" ||
         contextDataResult === "error"
@@ -60,8 +69,9 @@ const signin = async (req, res, next) => {
         logger.error(
           "Multiple signin attempts detected without verifying identity."
         );
+
         return res.status(401).json({
-          message: `This account has been temporarily blocked due to suspicious login activity. We have already sent a verification email to your registered email address. 
+          message: `You've temporarily been blocked due to suspicious login activity. We have already sent a verification email to your registered email address. 
           Please follow the instructions in the email to verify your identity and gain access to your account.
 
           Please note that repeated attempts to log in without verifying your identity will result in this device being permanently blocked from accessing your account.
@@ -90,7 +100,6 @@ const signin = async (req, res, next) => {
           req.mismatchedProps = mismatchedProps;
           req.currentContextData = currentContextData;
           req.user = existingUser;
-
           return next();
         }
       }
@@ -109,11 +118,7 @@ const signin = async (req, res, next) => {
       expiresIn: "7d",
     });
 
-    await RefreshToken.deleteOne({
-      user: existingUser._id,
-    });
-
-    const newRefreshToken = new RefreshToken({
+    const newRefreshToken = new Token({
       user: existingUser._id,
       refreshToken,
       accessToken,
@@ -201,12 +206,15 @@ const getUser = async (req, res, next) => {
     const posts = await Post.find({ user: user._id })
       .populate("community", "name members")
       .limit(20)
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
+
     user.posts = posts.map((post) => ({
       ...post,
       isMember: post.community?.members
         .map((member) => member.toString())
         .includes(user._id.toString()),
+      createdAt: formatCreatedAt(post.createdAt),
     }));
 
     res.status(200).json(user);
@@ -261,6 +269,7 @@ const addUser = async (req, res, next) => {
     if (newUser.isNew) {
       throw new Error("Failed to add user");
     }
+
     if (req.body.isConsentGiven === "false") {
       res.status(201).json({
         message: "User added successfully",
@@ -279,7 +288,7 @@ const logout = async (req, res) => {
   try {
     const accessToken = req.headers.authorization?.split(" ")[1] ?? null;
     if (accessToken) {
-      await RefreshToken.deleteOne({ accessToken });
+      await Token.deleteOne({ accessToken });
       logger.info(`User with access token ${accessToken} has logged out`);
     }
     return res.status(200).json({
@@ -296,7 +305,7 @@ const logout = async (req, res) => {
 const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
-    const existingToken = await RefreshToken.findOne({
+    const existingToken = await Token.findOne({
       refreshToken,
     });
     if (!existingToken) {
