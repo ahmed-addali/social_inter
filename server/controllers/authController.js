@@ -1,6 +1,9 @@
 const UserContext = require("../models/UserContext");
+const UserPreference = require("../models/UserPreference");
 const SuspiciousLogin = require("../models/SuspiciousLogin");
 const geoip = require("geoip-lite");
+const getUserFromToken = require("../utils/getUserFromToken");
+const formatCreatedAt = require("../utils/timeConverter");
 
 const getCurrentContextData = (req) => {
   const ip = req.clientIp || "unknown";
@@ -23,14 +26,14 @@ const getCurrentContextData = (req) => {
   const isTablet = req.useragent.isTablet || false;
 
   const deviceType = isMobile
-    ? "mobile"
+    ? "Mobile"
     : isDesktop
-    ? "desktop"
+    ? "Desktop"
     : isTablet
-    ? "tablet"
+    ? "Tablet"
     : "unknown";
 
-  const currentContextData = {
+  return {
     ip,
     country,
     city,
@@ -40,8 +43,54 @@ const getCurrentContextData = (req) => {
     device,
     deviceType,
   };
+};
 
-  return currentContextData;
+const isTrustedDevice = (currentContextData, userContextData) => {
+  return Object.keys(userContextData).every(
+    (key) => userContextData[key] === currentContextData[key]
+  );
+};
+
+const isSuspiciousContextChanged = (oldContextData, newContextData) =>
+  Object.keys(oldContextData).some(
+    (key) => oldContextData[key] !== newContextData[key]
+  );
+
+const isOldDataMatched = (oldSuspiciousContextData, userContextData) => {
+  return Object.keys(oldSuspiciousContextData).every(
+    (key) => oldSuspiciousContextData[key] === userContextData[key]
+  );
+};
+
+const getOldSuspiciousContextData = (_id, currentContextData) => {
+  return SuspiciousLogin.findOne({
+    user: _id,
+    ip: currentContextData.ip,
+    country: currentContextData.country,
+    city: currentContextData.city,
+    browser: currentContextData.browser,
+    platform: currentContextData.platform,
+    os: currentContextData.os,
+    device: currentContextData.device,
+    deviceType: currentContextData.deviceType,
+  });
+};
+
+const addNewSuspiciousLogin = async (_id, existingUser, currentContextData) => {
+  const newSuspiciousLogin = new SuspiciousLogin({
+    user: _id,
+    email: existingUser.email,
+    ip: currentContextData.ip,
+    country: currentContextData.country,
+    city: currentContextData.city,
+    browser: currentContextData.browser,
+    platform: currentContextData.platform,
+    os: currentContextData.os,
+    device: currentContextData.device,
+    deviceType: currentContextData.deviceType,
+  });
+
+  return await newSuspiciousLogin.save();
 };
 
 const verifyContextData = async (req, existingUser) => {
@@ -66,30 +115,24 @@ const verifyContextData = async (req, existingUser) => {
 
     const currentContextData = getCurrentContextData(req);
 
-    const oldSuspiciousContextData = await SuspiciousLogin.findOne({
-      user: _id,
-      ip: currentContextData.ip,
-      country: currentContextData.country,
-      city: currentContextData.city,
-      browser: currentContextData.browser,
-      platform: currentContextData.platform,
-      os: currentContextData.os,
-      device: currentContextData.device,
-      deviceType: currentContextData.deviceType,
-    });
+    if (isTrustedDevice(currentContextData, userContextData)) {
+      return "match";
+    }
+
+    const oldSuspiciousContextData = await getOldSuspiciousContextData(
+      _id,
+      currentContextData
+    );
+
+    if (oldSuspiciousContextData) {
+      if (oldSuspiciousContextData.isBlocked) return "blocked";
+      if (oldSuspiciousContextData.isTrusted) return "match";
+    }
 
     let newSuspiciousData = {};
-
     if (
       oldSuspiciousContextData &&
-      oldSuspiciousContextData.ip !== userContextData.ip &&
-      oldSuspiciousContextData.country !== userContextData.country &&
-      oldSuspiciousContextData.city !== userContextData.city &&
-      oldSuspiciousContextData.browser !== userContextData.browser &&
-      oldSuspiciousContextData.platform !== userContextData.platform &&
-      oldSuspiciousContextData.os !== userContextData.os &&
-      oldSuspiciousContextData.device !== userContextData.device &&
-      oldSuspiciousContextData.deviceType !== userContextData.deviceType
+      isSuspiciousContextChanged(oldSuspiciousContextData, currentContextData)
     ) {
       const {
         ip: suspiciousIp,
@@ -113,23 +156,15 @@ const verifyContextData = async (req, existingUser) => {
         suspiciousOs !== currentContextData.os
       ) {
         //  Suspicious login data found, but it doesn't match the current context data, so we add new suspicious login data
-        const newSuspiciousLogin = new SuspiciousLogin({
-          user: _id,
-          email: existingUser.email,
-          ip: currentContextData.ip,
-          country: currentContextData.country,
-          city: currentContextData.city,
-          browser: currentContextData.browser,
-          platform: currentContextData.platform,
-          os: currentContextData.os,
-          device: currentContextData.device,
-          deviceType: currentContextData.deviceType,
-        });
 
-        const res = await newSuspiciousLogin.save();
+        const res = await addNewSuspiciousLogin(
+          _id,
+          existingUser,
+          currentContextData
+        );
 
         newSuspiciousData = {
-          time: res.createdAt.toLocaleString(),
+          time: formatCreatedAt(res.createdAt),
           ip: res.ip,
           country: res.country,
           city: res.city,
@@ -145,35 +180,20 @@ const verifyContextData = async (req, existingUser) => {
       }
     } else if (
       oldSuspiciousContextData &&
-      oldSuspiciousContextData.ip === userContextData.ip &&
-      oldSuspiciousContextData.country === userContextData.country &&
-      oldSuspiciousContextData.city === userContextData.city &&
-      oldSuspiciousContextData.browser === userContextData.browser &&
-      oldSuspiciousContextData.platform === userContextData.platform &&
-      oldSuspiciousContextData.os === userContextData.os &&
-      oldSuspiciousContextData.device === userContextData.device &&
-      oldSuspiciousContextData.deviceType === userContextData.deviceType
+      isOldDataMatched(oldSuspiciousContextData, currentContextData)
     ) {
       return "match";
     } else {
       //  No previous suspicious login data found, so we create a new one
-      const newSuspiciousLogin = new SuspiciousLogin({
-        user: _id,
-        email: existingUser.email,
-        ip: currentContextData.ip,
-        country: currentContextData.country,
-        city: currentContextData.city,
-        browser: currentContextData.browser,
-        platform: currentContextData.platform,
-        os: currentContextData.os,
-        device: currentContextData.device,
-        deviceType: currentContextData.deviceType,
-      });
-
-      const res = await newSuspiciousLogin.save();
+      const res = await addNewSuspiciousLogin(
+        _id,
+        existingUser,
+        currentContextData
+      );
 
       newSuspiciousData = {
-        time: res.createdAt.toLocaleString(),
+        time: formatCreatedAt(res.createdAt),
+        id: res._id,
         ip: res.ip,
         country: res.country,
         city: res.city,
@@ -242,11 +262,11 @@ const addContextData = async (req, res) => {
   const isTablet = req.useragent.isTablet || false;
 
   const deviceType = isMobile
-    ? "mobile"
+    ? "Mobile"
     : isDesktop
-    ? "desktop"
+    ? "Desktop"
     : isTablet
-    ? "tablet"
+    ? "Tablet"
     : "unknown";
 
   const newUserContext = new UserContext({
@@ -274,7 +294,212 @@ const addContextData = async (req, res) => {
   }
 };
 
+const getAuthContextData = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const result = await UserContext.findOne({ user: userId });
+
+    if (!result) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    const userContextData = {
+      firstAdded: formatCreatedAt(result.createdAt),
+      ip: result.ip,
+      country: result.country,
+      city: result.city,
+      browser: result.browser,
+      platform: result.platform,
+      os: result.os,
+      device: result.device,
+      deviceType: result.deviceType,
+    };
+
+    res.status(200).json(userContextData);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const getTrustedAuthContextData = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const result = await SuspiciousLogin.find({
+      user: userId,
+      isTrusted: true,
+      isBlocked: false,
+    });
+
+    const trustedAuthContextData = result.map((item) => {
+      return {
+        _id: item._id,
+        time: formatCreatedAt(item.createdAt),
+        ip: item.ip,
+        country: item.country,
+        city: item.city,
+        browser: item.browser,
+        platform: item.platform,
+        os: item.os,
+        device: item.device,
+        deviceType: item.deviceType,
+      };
+    });
+
+    res.status(200).json(trustedAuthContextData);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const getBlockedAuthContextData = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const result = await SuspiciousLogin.find({
+      user: userId,
+      isBlocked: true,
+      isTrusted: false,
+    });
+
+    const blockedAuthContextData = result.map((item) => {
+      return {
+        _id: item._id,
+        time: formatCreatedAt(item.createdAt),
+        ip: item.ip,
+        country: item.country,
+        city: item.city,
+        browser: item.browser,
+        platform: item.platform,
+        os: item.os,
+        device: item.device,
+        deviceType: item.deviceType,
+      };
+    });
+
+    res.status(200).json(blockedAuthContextData);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const getUserPreferences = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const userPreferences = await UserPreference.findOne({ user: userId });
+
+    if (!userPreferences) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.status(200).json(userPreferences);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const deleteContextAuthData = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const contextId = req.params.contextId;
+
+    await SuspiciousLogin.deleteOne({ _id: contextId });
+
+    res.status(200).json({
+      message: "Data deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const blockContextAuthData = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const contextId = req.params.contextId;
+
+    await SuspiciousLogin.findOneAndUpdate(
+      { _id: contextId },
+      { $set: { isBlocked: true, isTrusted: false } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Blocked successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const unblockContextAuthData = async (req, res) => {
+  try {
+    const userId = getUserFromToken(req);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const contextId = req.params.contextId;
+
+    await SuspiciousLogin.findOneAndUpdate(
+      { _id: contextId },
+      { $set: { isBlocked: false, isTrusted: true } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Unblocked successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   verifyContextData,
   addContextData,
+  getAuthContextData,
+  getUserPreferences,
+  getTrustedAuthContextData,
+  getBlockedAuthContextData,
+  deleteContextAuthData,
+  blockContextAuthData,
+  unblockContextAuthData,
 };

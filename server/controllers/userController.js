@@ -1,26 +1,62 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const RefreshToken = require("../models/RefreshToken");
+const Token = require("../models/Token");
 const Post = require("../models/Post");
 const Community = require("../models/Community");
 const UserPreference = require("../models/UserPreference");
-const { logger } = require("../utils/logger");
+const formatCreatedAt = require("../utils/timeConverter");
 const { verifyContextData } = require("./authController");
 const getUserFromToken = require("../utils/getUserFromToken");
+const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const dayjs = require("dayjs");
 const duration = require("dayjs/plugin/duration");
 dayjs.extend(duration);
 
+const TYPE = {
+  SIGN_IN: "sign in",
+  LOGOUT: "logout",
+};
+
+const LEVEL = {
+  INFO: "info",
+  ERROR: "error",
+  WARN: "warn",
+};
+
+const MESSAGE = {
+  SIGN_IN_ATTEMPT: "User attempting to sign in",
+  SIGN_IN_ERROR: "Error occurred while signing in user: ",
+  INCORRECT_EMAIL: "Incorrect email",
+  INCORRECT_PASSWORD: "Incorrect password",
+  DEVICE_BLOCKED: "Sign in attempt from blocked device",
+  CONTEXT_DATA_VERIFY_ERROR: "Context data verification failed",
+  MULTIPLE_ATTEMPT_WITHOUT_VERIFY:
+    "Multiple sign in attempts detected without verifying identity.",
+  LOGOUT_SUCCESS: "User has logged out successfully",
+};
+
 const signin = async (req, res, next) => {
-  logger.info("User attempting to sign in");
+  await saveLogInfo(
+    req,
+    "User attempting to sign in",
+    TYPE.SIGN_IN,
+    LEVEL.INFO
+  );
+
   try {
     const { email, password } = req.body;
     const existingUser = await User.findOne({
       email,
     });
     if (!existingUser) {
-      logger.error("User not found");
+      await saveLogInfo(
+        req,
+        MESSAGE.INCORRECT_EMAIL,
+        TYPE.SIGN_IN,
+        LEVEL.ERROR
+      );
+
       return res.status(404).json({
         message: "Invalid credentials",
       });
@@ -32,7 +68,13 @@ const signin = async (req, res, next) => {
     );
 
     if (!isPasswordCorrect) {
-      logger.error("Invalid credentials");
+      await saveLogInfo(
+        req,
+        MESSAGE.INCORRECT_PASSWORD,
+        TYPE.SIGN_IN,
+        LEVEL.ERROR
+      );
+
       return res.status(400).json({
         message: "Invalid credentials",
       });
@@ -46,22 +88,46 @@ const signin = async (req, res, next) => {
     if (isContextAuthEnabled) {
       const contextDataResult = await verifyContextData(req, existingUser);
 
+      if (contextDataResult === "blocked") {
+        await saveLogInfo(
+          req,
+          MESSAGE.DEVICE_BLOCKED,
+          TYPE.SIGN_IN,
+          LEVEL.WARN
+        );
+
+        return res.status(401).json({
+          message:
+            "You've been blocked due to suspicious login activity. Please contact support for assistance.",
+        });
+      }
+
       if (
         contextDataResult === "no_context_data" ||
         contextDataResult === "error"
       ) {
-        logger.error("Error occurred while verifying context data");
+        await saveLogInfo(
+          req,
+          MESSAGE.CONTEXT_DATA_VERIFY_ERROR,
+          TYPE.SIGN_IN,
+          LEVEL.ERROR
+        );
+
         return res.status(500).json({
           message: "Error occurred while verifying context data",
         });
       }
 
       if (contextDataResult === "already_exists") {
-        logger.error(
-          "Multiple signin attempts detected without verifying identity."
+        await saveLogInfo(
+          req,
+          MESSAGE.MULTIPLE_ATTEMPT_WITHOUT_VERIFY,
+          TYPE.SIGN_IN,
+          LEVEL.WARN
         );
+
         return res.status(401).json({
-          message: `This account has been temporarily blocked due to suspicious login activity. We have already sent a verification email to your registered email address. 
+          message: `You've temporarily been blocked due to suspicious login activity. We have already sent a verification email to your registered email address. 
           Please follow the instructions in the email to verify your identity and gain access to your account.
 
           Please note that repeated attempts to log in without verifying your identity will result in this device being permanently blocked from accessing your account.
@@ -90,7 +156,6 @@ const signin = async (req, res, next) => {
           req.mismatchedProps = mismatchedProps;
           req.currentContextData = currentContextData;
           req.user = existingUser;
-
           return next();
         }
       }
@@ -109,11 +174,7 @@ const signin = async (req, res, next) => {
       expiresIn: "7d",
     });
 
-    await RefreshToken.deleteOne({
-      user: existingUser._id,
-    });
-
-    const newRefreshToken = new RefreshToken({
+    const newRefreshToken = new Token({
       user: existingUser._id,
       refreshToken,
       accessToken,
@@ -133,7 +194,13 @@ const signin = async (req, res, next) => {
       },
     });
   } catch (err) {
-    logger.error(`Error occurred while signing in user: ${err.message}`);
+    await saveLogInfo(
+      req,
+      MESSAGE.SIGN_IN_ERROR + err.message,
+      TYPE.SIGN_IN,
+      LEVEL.ERROR
+    );
+
     res.status(500).json({
       message: "Something went wrong",
     });
@@ -201,12 +268,15 @@ const getUser = async (req, res, next) => {
     const posts = await Post.find({ user: user._id })
       .populate("community", "name members")
       .limit(20)
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
+
     user.posts = posts.map((post) => ({
       ...post,
       isMember: post.community?.members
         .map((member) => member.toString())
         .includes(user._id.toString()),
+      createdAt: formatCreatedAt(post.createdAt),
     }));
 
     res.status(200).json(user);
@@ -261,6 +331,7 @@ const addUser = async (req, res, next) => {
     if (newUser.isNew) {
       throw new Error("Failed to add user");
     }
+
     if (req.body.isConsentGiven === "false") {
       res.status(201).json({
         message: "User added successfully",
@@ -279,14 +350,14 @@ const logout = async (req, res) => {
   try {
     const accessToken = req.headers.authorization?.split(" ")[1] ?? null;
     if (accessToken) {
-      await RefreshToken.deleteOne({ accessToken });
-      logger.info(`User with access token ${accessToken} has logged out`);
+      await Token.deleteOne({ accessToken });
+      await saveLogInfo(null, MESSAGE.LOGOUT_SUCCESS, TYPE.LOGOUT, LEVEL.INFO);
     }
     return res.status(200).json({
       message: "Logout successful",
     });
   } catch (err) {
-    logger.error(err);
+    await saveLogInfo(null, err.message, TYPE.LOGOUT, LEVEL.ERROR);
     return res.status(500).json({
       message: "Internal server error. Please try again later.",
     });
@@ -296,7 +367,7 @@ const logout = async (req, res) => {
 const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
-    const existingToken = await RefreshToken.findOne({
+    const existingToken = await Token.findOne({
       refreshToken,
     });
     if (!existingToken) {

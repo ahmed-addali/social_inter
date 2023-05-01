@@ -15,7 +15,6 @@ const postSchema = new Schema(
       type: String,
       trim: true,
     },
-
     community: {
       type: Schema.Types.ObjectId,
       ref: "Community",
@@ -32,7 +31,6 @@ const postSchema = new Schema(
         ref: "Comment",
       },
     ],
-
     likes: [
       {
         type: Schema.Types.ObjectId,
@@ -45,15 +43,15 @@ const postSchema = new Schema(
   }
 );
 
+postSchema.index({ body: "text" });
+
 postSchema.pre("remove", async function (next) {
   try {
     if (this.fileUrl) {
       const filename = path.basename(this.fileUrl);
-      console.log(filename);
       const deleteFilePromise = promisify(fs.unlink)(
         path.join(__dirname, "../assets/userFiles", filename)
       );
-      console.log(path.join(__dirname, "../assets/userFiles", filename));
       await deleteFilePromise;
     }
     const commentIds = this.comments.map((comment) => comment.toString());

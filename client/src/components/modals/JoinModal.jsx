@@ -1,12 +1,11 @@
-import React, { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
 import { Fragment, useRef, useState, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { joinCommunityAndFetchData } from "../../redux/actions/communityActions";
-import {IoIosPeople} from 'react-icons/io'
-import {HiUsers} from 'react-icons/hi2'
-import LoadingSpinner from "../spinner/LoadingSpinner";
+import { IoIosPeople } from "react-icons/io";
+import LoadingSpinner from "../loader/ButtonLoadingSpinner";
 
 const JoinModal = memo(({ show, onClose, community }) => {
   const navigate = useNavigate();
@@ -19,19 +18,23 @@ const JoinModal = memo(({ show, onClose, community }) => {
 
   const joinCommunityHandler = useCallback(
     async (communityName) => {
-      setLoading(true);
       try {
+        setLoading(true);
         await dispatch(joinCommunityAndFetchData(communityName, userData));
         navigate(`/community/${communityName}`);
-      } catch (error) {
-        loading(false);
       } finally {
         setLoading(false);
         onClose();
       }
     },
-    [dispatch, userData, navigate, onClose, loading]
+    [dispatch, userData, navigate, onClose]
   );
+
+  useEffect(() => {
+    if (!loading) {
+      setLoading(false);
+    }
+  }, [loading]);
 
   return (
     <>
@@ -70,15 +73,15 @@ const JoinModal = memo(({ show, onClose, community }) => {
                     as="h3"
                     className="text-xl font-medium leading-6 flex gap-2 items-center text-primary"
                   >
-                   <IoIosPeople className="text-xl text-primary"/> 
-                   <div className="relative">
-                   {community.name}
-                  <p className="absolute -top-3 -right-4 bg-primary text-white w-5 h-5 flex justify-center items-center text-xs rounded-full">{community.members.length}</p>
+                    <IoIosPeople className="text-xl text-primary" />
+                    <div className="relative">
+                      {community.name}
+                      <p className="absolute -top-3 -right-4 bg-primary text-white w-5 h-5 flex justify-center items-center text-xs rounded-full">
+                        {community.members.length}
+                      </p>
                     </div>
                   </Dialog.Title>
                   <div className="mt-2">
-                  
-
                     <p className="text-base text-center text-gray-700">
                       Are you sure you want to join this community? You can
                       always leave later.
@@ -109,10 +112,8 @@ const JoinModal = memo(({ show, onClose, community }) => {
                     </button>
                   </div>
                 </Dialog.Panel>
-                
               </Transition.Child>
             </div>
-            
           </div>
         </Dialog>
       </Transition>

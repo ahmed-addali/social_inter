@@ -10,6 +10,8 @@ import React, { useEffect } from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setInitialAuthState } from "./redux/actions/authActions";
+import Navbar from "./components/common/Navbar";
+import LeftBar from "./components/common/LeftBar";
 
 function isAuthenticated(user, accessToken) {
   return user && accessToken;
@@ -29,7 +31,13 @@ const PrivateRoute = () => {
   }, [user, accessToken, dispatch, navigate]);
 
   return isAuthenticated(user, accessToken) ? (
-    <Outlet />
+    <>
+      <Navbar />
+      <div className="flex lg:px-40 mx-auto bg-[#F6F7FA] my-20">
+        <LeftBar />
+        <Outlet />
+      </div>
+    </>
   ) : (
     <Navigate to="/signin" />
   );

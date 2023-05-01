@@ -17,9 +17,10 @@ export const logoutAction = () => async (dispatch) => {
 };
 
 export const signUpAction =
-  (formData, navigate, isConsentGiven = false,email) =>
+  (formData, navigate, isConsentGiven = false, email) =>
   async (dispatch) => {
     try {
+      localStorage.removeItem("profile");
       const response = await api.signUp(formData);
       const { error } = response;
       if (error) {
@@ -98,6 +99,120 @@ export const getModProfileAction = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: types.GET_MOD_PROFILE_FAIL,
+      payload: types.ERROR_MESSAGE,
+    });
+  }
+};
+
+export const getContextAuthDataAction = () => async (dispatch) => {
+  try {
+    const { error, data } = await api.getContextAuthData();
+    if (error) {
+      throw new Error(error);
+    }
+    dispatch({
+      type: types.GET_CONTEXT_AUTH_DATA_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: types.GET_CONTEXT_AUTH_DATA_FAIL,
+      payload: types.ERROR_MESSAGE,
+    });
+  }
+};
+
+export const getTrustedContextAuthDataAction = () => async (dispatch) => {
+  try {
+    const { error, data } = await api.getTrustedContextAuthData();
+    if (error) {
+      throw new Error(error);
+    }
+    dispatch({
+      type: types.GET_TRUSTED_AUTH_CONTEXT_DATA_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: types.GET_TRUSTED_AUTH_CONTEXT_DATA_FAIL,
+      payload: types.ERROR_MESSAGE,
+    });
+  }
+};
+
+export const getUserPreferencesAction = () => async (dispatch) => {
+  try {
+    const { error, data } = await api.getUserPreferences();
+    if (error) {
+      throw new Error(error);
+    }
+    dispatch({
+      type: types.GET_USER_PREFERENCES_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: types.GET_USER_PREFERENCES_FAIL,
+      payload: types.ERROR_MESSAGE,
+    });
+  }
+};
+
+export const getBlockedAuthContextDataAction = () => async (dispatch) => {
+  try {
+    const { error, data } = await api.getBlockedAuthContextData();
+    if (error) {
+      throw new Error(error);
+    }
+    dispatch({
+      type: types.GET_BLOCKED_AUTH_CONTEXT_DATA_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: types.GET_BLOCKED_AUTH_CONTEXT_DATA_FAIL,
+      payload: types.ERROR_MESSAGE,
+    });
+  }
+};
+
+export const deleteContextAuthDataAction = (contextId) => async (dispatch) => {
+  try {
+    const { error } = await api.deleteContextAuthData(contextId);
+    if (error) {
+      throw new Error(error);
+    }
+  } catch (error) {
+    dispatch({
+      type: types.DELETE_CONTEXT_AUTH_DATA_FAIL,
+      payload: types.ERROR_MESSAGE,
+    });
+  }
+};
+
+export const blockContextAuthDataAction = (contextId) => async (dispatch) => {
+  try {
+    const { error } = await api.blockContextAuthData(contextId);
+    if (error) {
+      throw new Error(error);
+    }
+  } catch (error) {
+    dispatch({
+      type: types.BLOCK_CONTEXT_AUTH_DATA_FAIL,
+      payload: types.ERROR_MESSAGE,
+    });
+  }
+};
+
+export const unblockContextAuthDataAction = (contextId) => async (dispatch) => {
+  try {
+    const { error } = await api.unblockContextAuthData(contextId);
+    if (error) {
+      throw new Error(error);
+    }
+  } catch (error) {
+    dispatch({
+      type: types.UNBLOCK_CONTEXT_AUTH_DATA_FAIL,
       payload: types.ERROR_MESSAGE,
     });
   }
