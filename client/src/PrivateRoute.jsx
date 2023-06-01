@@ -42,11 +42,14 @@ const PrivateRoute = ({ userData }) => {
   );
 
   return isAuthenticated(userData, accessToken) ? (
-    <div >
+    <div className="bg-background">
       <Navbar userData={userData} />
-      <div className="flex lg:px-40 w-full mx-auto bg-bg">
+
+      <div className="grid grid-cols-4 gap-6 w-9/12 mx-auto">
         <Leftbar />
+
         <Outlet />
+
         {showRightbar ? (
           currentUserIsModerator ? (
             <ModeratorRightbar />
