@@ -1,11 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family: 'Inter', sans-serif;
+* {
+  font-family: "Inter", sans-serif;
+}
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--primary);
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-image: linear-gradient(180deg,#225e6b 0%, #5b3163 99%);
+  border-radius: 10px;
+  border: 2px solid #ffff;
+}
+body {
+  background-color: #f7fafc;
 }
 
 .tooltip {
@@ -36,3 +53,14 @@
   height: calc(100vh - 5rem);
 }
 
+.main-section {
+  @apply col-span-2 rounded-md mt-1;
+}
+
+.leftbar {
+  @apply col-span-1 bg-white sticky top-20 pt-5 h-[85vh] rounded-md border;
+}
+
+.rightbar {
+  @apply col-span-1 bg-white sticky top-20 h-[85vh] p-5 rounded-md border;
+}
