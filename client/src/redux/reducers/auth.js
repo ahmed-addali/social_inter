@@ -8,10 +8,15 @@ const initialState = {
   userData: null,
   refreshToken: null,
   accessToken: null,
-  signUperror: [],
-  signInerror: null,
+  signInError: null,
+  signUpError: [],
   successMessage: null,
-  isModerator: false,
+  isModeratorOfThisCommunity: false,
+  contextAuthData: null,
+  trustedAuthContextData: [],
+  blockedAuthContextData: [],
+  userPreferences: null,
+  contextAuthError: null,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -21,8 +26,8 @@ const authReducer = (state = initialState, action) => {
     case types.SIGNUP_SUCCESS:
       return {
         ...state,
-        signInerror: null,
-        signUperror: [],
+        signInError: null,
+        signUpError: [],
         successMessage: payload ? payload : null,
       };
 
@@ -30,8 +35,8 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         successMessage: null,
-        signInerror: null,
-        signUperror: payload ? payload : [],
+        signInError: null,
+        signUpError: payload ? payload : [],
       };
 
     case types.SIGNIN_SUCCESS:
@@ -40,7 +45,7 @@ const authReducer = (state = initialState, action) => {
         userData: payload ? payload.user : null,
         accessToken: payload ? payload.accessToken : null,
         refreshToken: payload ? payload.refreshToken : null,
-        signInerror: null,
+        signInError: null,
         successMessage: payload ? payload : null,
       };
 
@@ -48,8 +53,8 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         successMessage: null,
-        signUperror: [],
-        signInerror: payload ? payload : null,
+        signUpError: [],
+        signInError: payload ? payload : null,
       };
 
     case types.LOGOUT:
@@ -58,10 +63,10 @@ const authReducer = (state = initialState, action) => {
         userData: null,
         refreshToken: null,
         accessToken: null,
-        signInerror: null,
-        signUperror: [],
+        signInError: null,
+        signUpError: [],
         successMessage: null,
-        isModerator: false,
+        isModeratorOfThisCommunity: false,
       };
 
     case types.REFRESH_TOKEN_SUCCESS:
@@ -77,26 +82,90 @@ const authReducer = (state = initialState, action) => {
         userData: null,
         refreshToken: null,
         accessToken: null,
-        signUperror: [],
-        signInerror: null,
+        signUpError: [],
+        signInError: null,
         successMessage: null,
-        isModerator: false,
+        isModeratorOfThisCommunity: false,
       };
 
     case GET_COMMUNITY_SUCCESS:
       const moderators = payload ? payload.moderators : [];
-      const isModerator = moderators.some(
+      const isModeratorOfThisCommunity = moderators.some(
         (moderator) => moderator === state.userData?._id
       );
       return {
         ...state,
-        isModerator,
+        isModeratorOfThisCommunity,
       };
 
     case GET_COMMUNITY_FAIL:
       return {
         ...state,
-        isModerator: false,
+        isModeratorOfThisCommunity: false,
+      };
+
+    case types.GET_CONTEXT_AUTH_DATA_SUCCESS:
+      return {
+        ...state,
+        contextAuthData: payload ? payload : null,
+        contextAuthError: null,
+      };
+
+    case types.GET_CONTEXT_AUTH_DATA_FAIL:
+      return {
+        ...state,
+        contextAuthData: null,
+        contextAuthError: payload ? payload : null,
+      };
+
+    case types.GET_TRUSTED_AUTH_CONTEXT_DATA_SUCCESS:
+      return {
+        ...state,
+        trustedAuthContextData: payload ? payload : [],
+        contextAuthError: null,
+      };
+
+    case types.GET_TRUSTED_AUTH_CONTEXT_DATA_FAIL:
+      return {
+        ...state,
+        trustedAuthContextData: [],
+        contextAuthError: payload ? payload : null,
+      };
+
+    case types.GET_USER_PREFERENCES_SUCCESS:
+      return {
+        ...state,
+        userPreferences: payload ? payload : null,
+        contextAuthError: null,
+      };
+
+    case types.GET_USER_PREFERENCES_FAIL:
+      return {
+        ...state,
+        userPreferences: null,
+        contextAuthError: payload ? payload : null,
+      };
+
+    case types.GET_BLOCKED_AUTH_CONTEXT_DATA_SUCCESS:
+      return {
+        ...state,
+        blockedAuthContextData: payload ? payload : [],
+        contextAuthError: null,
+      };
+
+    case types.GET_BLOCKED_AUTH_CONTEXT_DATA_FAIL:
+      return {
+        ...state,
+        blockedAuthContextData: [],
+        contextAuthError: payload ? payload : null,
+      };
+
+    case types.DELETE_CONTEXT_AUTH_DATA_FAIL:
+    case types.UNBLOCK_CONTEXT_AUTH_DATA_FAIL:
+    case types.BLOCK_CONTEXT_AUTH_DATA_FAIL:
+      return {
+        ...state,
+        contextAuthError: payload ? payload : null,
       };
 
     default:

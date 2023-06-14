@@ -1,18 +1,12 @@
-import React from "react";
-import LeftBar from "../components/home/LeftBar";
-import MainSection from "../components/home/MainSection";
-import RightBar from "../components/home/RightBar";
+import { useSelector } from "react-redux";
 
-import Navbar from "../components/home/Navbar";
+import MainSection from "../components/home/MainSection";
 const Home = () => {
+  const userData = useSelector((state) => state.auth?.userData);
+
   return (
-    <div className="bg-[#F6F7FA]">
-      <Navbar />
-      <div className="flex lg:px-40 mx-auto bg-[#F6F7FA]">
-        <LeftBar />
-        <MainSection />
-        <RightBar />
-      </div>
+    <div className="main-section">
+      <MainSection userData={userData} />
     </div>
   );
 };

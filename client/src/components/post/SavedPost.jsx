@@ -1,13 +1,13 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { HiOutlineChatBubbleOvalLeft } from "react-icons/hi2";
 import Like from "./Like";
-import {IoIosArrowBack} from 'react-icons/io'
+import { IoIosArrowBack } from "react-icons/io";
 const SavedPost = ({ post }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { body, fileUrl, user, community, createdAt, comments } = post;
+  const { content, fileUrl, user, community, createdAt, comments } = post;
 
   const isImageFile = useMemo(() => {
     const validExtensions = [".jpg", ".png", ".jpeg", ".gif", ".webp", ".svg"];
@@ -20,10 +20,12 @@ const SavedPost = ({ post }) => {
   };
 
   return (
-    <div className="px-6 py-6 rounded-xl shadow-xl bg-white border border-gray-100">
-       <p className="border border-dashed border-primary cursor-pointer px-2 py-2 w-7 h-7 flex justify-center items-center mb-3 rounded-full">
-       <IoIosArrowBack className="text-primary text-xl font-semibold" onClick={handleBack}/>
-       
+    <div className="px-6 py-6 rounded-md border bg-white mb-6 w-full">
+      <p className="border border-dashed border-primary cursor-pointer px-2 py-2 w-7 h-7 flex justify-center items-center mb-3 rounded-full">
+        <IoIosArrowBack
+          className="text-primary text-xl font-semibold"
+          onClick={handleBack}
+        />
       </p>
       <div className="flex justify-between">
         <div className="flex gap-2">
@@ -49,13 +51,13 @@ const SavedPost = ({ post }) => {
           });
         }}
       >
-        <p className="text-lg mt-3">{body}</p>
+        <p className="text-lg mt-3">{content}</p>
         <div className="flex justify-center">
           {fileUrl && isImageFile ? (
             <img
               className="w-[800px] h-auto rounded-xl mt-3"
               src={fileUrl}
-              alt={body}
+              alt={content}
               loading="lazy"
             />
           ) : (

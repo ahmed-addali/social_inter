@@ -3,9 +3,9 @@ import { LOGOUT } from "../constants/authConstants";
 
 const initialState = {
   communityData: null,
-  joinedCommunities: [],
+  joinedCommunities: null,
   notJoinedCommunities: [],
-  reportedPosts: [],
+  reportedPosts: null,
   communityError: null,
 };
 
@@ -17,9 +17,9 @@ const communityReducer = (state = initialState, action) => {
       return {
         ...state,
         communityData: null,
-        joinedCommunities: [],
+        joinedCommunities: null,
         notJoinedCommunities: [],
-        reportedPosts: [],
+        reportedPosts: null,
         communityError: null,
       };
 
@@ -38,7 +38,7 @@ const communityReducer = (state = initialState, action) => {
     case types.GET_JOINED_COMMUNITIES_SUCCESS:
       return {
         ...state,
-        joinedCommunities: payload ? payload : [],
+        joinedCommunities: payload ? payload : null,
         communityError: null,
       };
     case types.GET_JOINED_COMMUNITIES_FAIL:
@@ -93,10 +93,6 @@ const communityReducer = (state = initialState, action) => {
     case types.REPORT_POST_SUCCESS:
       return {
         ...state,
-        communityData: {
-          ...state.communityData,
-          reportedPosts: [...state.communityData.reportedPosts, payload],
-        },
         communityError: null,
       };
     case types.REPORT_POST_FAIL:
@@ -116,15 +112,6 @@ const communityReducer = (state = initialState, action) => {
       return {
         ...state,
         communityError: payload,
-      };
-
-    case types.DELETE_REPORTED_POST_SUCCESS:
-      return {
-        ...state,
-        reportedPosts: state.reportedPosts.filter(
-          (post) => post._id !== payload
-        ),
-        communityError: null,
       };
 
     case types.DELETE_REPORTED_POST_FAIL:

@@ -1,24 +1,15 @@
-/**
- * A container component that sets up the Redux store and
- * checks server status before rendering the main application.
- *
- * @component
- * @returns {JSX.Element} The rendered React component
- * 
- * @description
- * This component sets up the Redux store using `createAppStore()` and
- * checks server status using an HTTP GET request to `/check-connectivity`.
- * If the server is down, the component will display an error message.
- * If there is an error setting up the store, it will also display an error message.
- */
-
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Provider } from "react-redux";
 import createAppStore from "./redux/store";
-import App from "./App";
 import axios from "axios";
+import CommonLoading from "./components/loader/CommonLoading";
+import App from "./App";
+import { getTitleFromRoute } from "./utils/docTitle";
+import { Helmet } from "react-helmet";
+import { useLocation } from "react-router-dom";
 
 const AppContainer = () => {
+  const location = useLocation();
   const [store, setStore] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,13 +17,14 @@ const AppContainer = () => {
   useEffect(() => {
     const checkServerStatus = async () => {
       try {
-        await axios.get("/check-connectivity");
+        await axios.get("/server-status");
       } catch (error) {
         setError("Server is down. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
+
     checkServerStatus();
   }, []);
 
@@ -47,11 +39,16 @@ const AppContainer = () => {
         setLoading(false);
       }
     };
+
     loadStore();
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <CommonLoading />
+      </div>
+    );
   }
 
   if (error) {
@@ -64,6 +61,9 @@ const AppContainer = () => {
 
   return (
     <Provider store={store}>
+      <Helmet>
+        <title>{getTitleFromRoute(location.pathname)}</title>
+      </Helmet>
       <App />
     </Provider>
   );

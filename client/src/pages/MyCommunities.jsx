@@ -1,48 +1,39 @@
-import React, { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
 import { getJoinedCommunitiesAction } from "../redux/actions/communityActions";
 import JoinedCommunityCard from "../components/community/JoinedCommunityCard";
-import Leftbar from "../components/home/LeftBar";
-import Rightbar from "../components/home/RightBar";
-import Navbar from "../components/home/Navbar";
+import CommonLoading from "../components/loader/CommonLoading";
 const MyCommunities = () => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
   const joinedCommunities = useSelector(
     (state) => state.community?.joinedCommunities
   );
 
   useEffect(() => {
-    dispatch(getJoinedCommunitiesAction());
-  }, [dispatch]);
+    const fetchData = async () => {
+      await dispatch(getJoinedCommunitiesAction());
+    };
+    fetchData().then(() => setLoading(false));
+  }, [dispatch, loading]);
 
   const communityCards = useMemo(() => {
-    if (!joinedCommunities) {
-      return null;
-      // later add a loading spinner
-    }
-
-    return joinedCommunities.map((community) => (
-      <div
-        key={community._id}
-        className="grid grid-cols-2 gap-5" 
-      >
-        <JoinedCommunityCard  className="grid grid-cols-2 gap-5"  community={community} />
+    return joinedCommunities?.map((community) => (
+      <div key={community._id} className="main-section flex items-center ">
+        <JoinedCommunityCard className="mb-5" community={community} />
       </div>
     ));
   }, [joinedCommunities]);
+  if (loading) {
+    return (
+      <div className="col-span-2 flex justify-center items-center h-screen">
+        <CommonLoading />
+      </div>
+    );
+  }
 
-  return (
-    <div className="bg-[#F6F7FA]">
-      <Navbar />
-      <div className="flex lg:px-40 mx-auto bg-[#F6F7FA]">
-      <Leftbar />
-      <div className="flex flex-wrap justify-center w-6/12 px-10 py-6">{communityCards}</div>
-      <Rightbar />
-    </div>
-    </div>
-  );
+  return <div className="main-section">{communityCards}</div>;
 };
 
 export default MyCommunities;

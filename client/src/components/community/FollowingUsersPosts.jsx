@@ -1,6 +1,7 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getFollowingUsersPostsAction } from "../../redux/actions/postActions";
+import CommonLoading from "../loader/CommonLoading";
 import Post from "../post/Post";
 
 const MemoizedPost = memo(Post);
@@ -32,17 +33,21 @@ const FollowingUsersPosts = ({ communityData }) => {
   }, [followingUsersPosts]);
 
   return (
-    <div className="flex-grow h-full bg-gray-100">
+    <div className="main-section">
       {isLoading || !communityData ? (
-        <div>Loading...</div>
+        <div className="flex items-center justify-center">
+          <CommonLoading />
+        </div>
       ) : (
         <>
           {followingUsersPosts.length > 0 ? (
-            <div className="text-xl">{memoizedFollowingUsersPost}</div>
+            <div>{memoizedFollowingUsersPost}</div>
           ) : (
-            <div>
-              None of your following users have posted anything yet. Check back
-              later!
+            <div className="text-center text-gray-700 flex justify-center items-center flex-col">
+             
+              <img src="/nopost.jpg" alt="no post" />
+              <p className="text-lg font-semibold py-5">None of your following users have posted anything yet. Check back
+              later!</p>
             </div>
           )}
         </>

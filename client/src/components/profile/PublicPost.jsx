@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Post from "../post/Post";
 import { useSelector, useDispatch } from "react-redux";
 import { getPublicPostsAction } from "../../redux/actions/postActions";
+import CommonLoading from "../loader/CommonLoading";
 
 const PublicPost = ({ publicUserId }) => {
   const [loading, setLoading] = useState(false);
@@ -18,14 +19,20 @@ const PublicPost = ({ publicUserId }) => {
   }, [dispatch, publicUserId]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex mt-5 justify-center items-center">
+        <CommonLoading />
+      </div>
+    );
   }
 
   return (
     <div className="my-4">
-      <h1 className="text-2xl font-bold my-3">Posts</h1>
+      <h2 className="text-lg font-bold my-3 border-b pb-2">Posts</h2>
       {publicPosts?.length === 0 ? (
-        <p>No posts yet</p>
+        <p className="text-center">
+          User has not posted anything yet. Check back later!
+        </p>
       ) : (
         <div className="flex gap-4 flex-wrap">
           {publicPosts?.map((post) => (

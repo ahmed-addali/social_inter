@@ -1,26 +1,38 @@
-import React from "react";
-import ModeratorProfile from "../components/moderator/ModeratorProfile";
-import Leftbar from "../components/home/LeftBar";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import CommonLoading from "../components/loader/CommonLoading";
+
 import MainSection from "../components/moderator/MainSection";
 import ModeratorsList from "../components/moderator/ModeratorsList";
-import Navbar from "../components/home/Navbar";
 
 const Moderator = () => {
+  const navigate = useNavigate();
+
+  const userRole = useSelector((state) => state.auth?.userData?.role);
+
+  useEffect(() => {
+    if (userRole !== "moderator") {
+      navigate("/access-denied");
+    }
+  }, [userRole, navigate]);
+
+  if (userRole !== "moderator")
+    return (
+      <div className="col-span-3 flex items-center justify-center h-screen">
+        <CommonLoading />
+      </div>
+    );
+
   return (
-      <div className="bg-[#F6F7FA]">
-          <Navbar />
-          <div className="flex lg:px-40 mx-auto bg-[#F6F7FA]">
-      <Leftbar />
-      <div className="w-6/12 px-10 py-5">
-
-
+    <>
+      <div className="col-span-2 bg-white mt-6 border rounded-md">
         <MainSection />
       </div>
-      <div className="w-3/12 h-[86vh] bg-white sticky top-20 right-0 shadow-2xl shadow-[#F3F8FF] px-6 py-6 my-5 rounded-lg">
+      <div className="col-span-1 bg-white sticky top-20 border h-screen-20 p-5 rounded-md">
         <ModeratorsList />
       </div>
-    </div>
-    </div>
+    </>
   );
 };
 

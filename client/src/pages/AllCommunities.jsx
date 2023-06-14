@@ -1,11 +1,8 @@
-import React, { useEffect } from "react";
-import Leftbar from "../components/home/LeftBar";
-import Rightbar from "../components/home/RightBar";
-import CommunityCard from "../components/community/CommunityCard";
+import { useEffect } from "react";
 import { getNotJoinedCommunitiesAction } from "../redux/actions/communityActions";
 import { useDispatch, useSelector } from "react-redux";
-import Navbar from "../components/home/Navbar";
-
+import CommonLoading from "../components/loader/CommonLoading";
+import CommunityCard from "../components/community/CommunityCard";
 const AllCommunities = () => {
   const dispatch = useDispatch();
 
@@ -18,22 +15,17 @@ const AllCommunities = () => {
   }, [dispatch]);
 
   if (!notJoinedCommunities) {
-    return null;
-    // later add a loading spinner
+    return (
+      <div className="main-section flex items-center justify-center">
+        <CommonLoading />
+      </div>
+    );
   }
   return (
-    <div className="bg-[#F6F7FA]">
-    <Navbar />
-    <div className="flex lg:px-40 mx-auto bg-[#F6F7FA]">
-      <Leftbar />
-      <div className="grid grid-cols-2 gap-4 w-6/12 px-10 py-6">
-        {notJoinedCommunities?.map((community) => (
-          <CommunityCard key={community._id} community={community} />
-        ))}
-      </div>
-
-      <Rightbar />
-    </div>
+    <div className="main-section grid grid-cols-2 gap-5 items-center bg-white px-4 py-4">
+      {notJoinedCommunities?.map((community) => (
+        <CommunityCard key={community._id} community={community} />
+      ))}
     </div>
   );
 };

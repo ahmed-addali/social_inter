@@ -1,35 +1,74 @@
-/**
- * @function PrivateRoute
- * @description A higher order component that protects routes from unauthenticated
- * access by redirecting to the login page if the user is not authenticated.
- * @returns {JSX.Element} The component that renders the child routes if the user is authenticated,
- * or redirects to the login page if the user is not authenticated.
- */
-
-import React, { useEffect } from "react";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useMemo, useEffect, useState } from "react";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { setInitialAuthState } from "./redux/actions/authActions";
+import Navbar from "./components/shared/Navbar";
+import Leftbar from "./components/shared/Leftbar";
+import Rightbar from "./components/shared/Rightbar";
 
-function isAuthenticated(user, accessToken) {
-  return user && accessToken;
-}
+import ModeratorRightbar from "./components/moderator/Rightbar";
 
-const PrivateRoute = () => {
+const noRightbarRoutes = [
+  /\/post\/[^/]+$/,
+  /\/community\/[^/]+$/,
+  /\/community\/[^/]+\/report$/,
+  /\/community\/[^/]+\/reported-post$/,
+  /\/community\/[^/]+\/moderator$/,
+].map((regex) => new RegExp(regex));
+
+const PrivateRoute = ({ userData }) => {
+  const isAuthenticated = useMemo(() => {
+    return (userData, accessToken) => {
+      return userData && accessToken;
+    };
+  }, []);
+
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.userData);
   const token = localStorage.getItem("profile");
   const accessToken = JSON.parse(token)?.accessToken;
 
+  const currentUserIsModerator = userData?.role === "moderator";
+
   useEffect(() => {
-    if (!isAuthenticated(user, accessToken)) {
+    if (!isAuthenticated(userData, accessToken)) {
       dispatch(setInitialAuthState(navigate));
     }
-  }, [user, accessToken, dispatch, navigate]);
+  }, [dispatch, navigate, userData, accessToken, isAuthenticated]);
 
-  return isAuthenticated(user, accessToken) ? (
-    <Outlet />
+  const showRightbar = !noRightbarRoutes.some((regex) =>
+    regex.test(location.pathname)
+  );
+
+  const [showLeftbar, setShowLeftbar] = useState(false);
+
+  const toggleLeftbar = () => {
+    setShowLeftbar(!showLeftbar);
+  };
+
+  return isAuthenticated(userData, accessToken) ? (
+    <div className="scroll-smooth">
+      <Navbar
+        userData={userData}
+        toggleLeftbar={toggleLeftbar}
+        showLeftbar={showLeftbar}
+      />
+
+      <div className="md:grid md:grid-cols-4 md:gap-6 md:w-10/12 md:mx-auto">
+        <Leftbar showLeftbar={showLeftbar} />
+
+        <Outlet />
+
+        {showRightbar ? (
+          currentUserIsModerator ? (
+            <ModeratorRightbar />
+          ) : (
+            <Rightbar />
+          )
+        ) : null}
+      </div>
+    </div>
   ) : (
     <Navigate to="/signin" />
   );

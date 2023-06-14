@@ -1,20 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { getCommentsAction } from "../../redux/actions/postActions";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-const CommentSidebar = () => {
-  const { postId } = useParams();
-  const dispatch = useDispatch();
-
-  const userData = useSelector((state) => state.auth?.userData);
-
+const CommentSidebar = ({ comments }) => {
   const currentPage = 1;
   const [commentsPerPage, setCommentsPerPage] = useState(10);
-
-  const comments = useSelector((state) =>
-    state.posts?.comments.filter((comment) => comment.post === postId)
-  );
 
   const indexOfLastComment = currentPage * commentsPerPage;
   const indexOfFirstComment = indexOfLastComment - commentsPerPage;
@@ -23,50 +12,61 @@ const CommentSidebar = () => {
     indexOfLastComment
   );
 
-  useEffect(() => {
-    if (userData) {
-      dispatch(getCommentsAction(postId));
-    }
-  }, [userData, dispatch, postId]);
-
   const handleLoadMore = () => {
     setCommentsPerPage(commentsPerPage + 10);
   };
 
   return (
-    <div className="w-3/12 h-[86vh] bg-white sticky top-20 right-0 shadow-2xl shadow-[#F3F8FF] px-6 py-6 my-5 rounded-lg overflow-y-auto">
+    <div className="col-span-1 bg-white sticky top-20 h-[85vh] p-5 rounded-md border overflow-y-auto">
       {currentComments.length > 0 && (
-        <div className="">
-          <h2 className="text-lg font-semibold mb-4">Recent Comments</h2>
+        <div>
+          <h2 className="font-semibold mb-4 text-center border-b py-3">
+            Recent Comments
+          </h2>
           {currentComments.map((comment) => (
-            <div key={comment._id} className="flex flex-col my-4 bg-white border border-dashed border-slate-200 px-3 py-3 rounded-lg">
-              <div className="flex">
-              <img
-                src={comment.user.avatar}
-                alt="User Avatar"
-                className="w-9 h-9 rounded-full mr-2"
-              />
-              
-                <div className="-mt-1">
-                  <h3 className=" font-semibold text-base">{comment.user.name}</h3>
-                  <p className="text-gray-500 text-xs">
+            <div
+              key={comment._id}
+              className="flex flex-col bg-white p-3 shadow-md border rounded-md my-4 shadow-[#f2f5fc] w-full"
+            >
+              <div className="flex gap-2">
+                <img
+                  src={comment.user.avatar}
+                  alt="User Avatar"
+                  className="w-9 h-9 rounded-full"
+                />
+
+                <div className="flex flex-col ">
+                  <span className="text-md font-semibold hover:underline">
+                    <Link to={`/user/${comment.user._id}`}>
+                      {comment.user.name}
+                    </Link>
+                  </span>
+                  <p className="text-gray-500 text-xs ml-1">
                     {comment.createdAt}
                   </p>
                 </div>
-               
               </div>
-             
-              <p className="text-lg">{comment.body}</p>
-             
+
+              <p className="text-sm mt-2 whitespace-normal break-words">
+                {comment.content}
+              </p>
             </div>
-            
           ))}
+
           {currentComments.length < comments.length && (
-            <button className="text-primary border border-dashed border-blue-500
-            hover:bg-primary 
-             rounded-md py-1 px-2 text-sm font-semibold group transition duration-300" onClick={handleLoadMore}>Load More</button>
+            <button
+              className="text-primary text-sm font-semibold mt-3 w-full"
+              onClick={handleLoadMore}
+            >
+              Load More
+            </button>
           )}
-          
+        </div>
+      )}
+
+      {currentComments.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-full">
+          <p className="text-lg font-semibold mb-4">No Comments Yet</p>
         </div>
       )}
     </div>

@@ -1,114 +1,220 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   createPostAction,
-  getPostsAction,
-  getComPostsAction,
+  clearCreatePostFail,
 } from "../../redux/actions/postActions";
-import { useSelector } from "react-redux";
+import InappropriatePostModal from "../modals/InappropriatePostModal";
+import TopicConflictModal from "../modals/TopicConflictModal";
+import EligibilityDetectionFailModal from "../modals/EligibilityDetectionFailModal";
 
-const PostForm = () => {
-  const community = useSelector((state) => state.community?.communityData);
-  const user = useSelector((state) => state.auth?.userData);
-
-  const [body, setBody] = useState("");
-  const [file, setFile] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
+const PostForm = ({ communityId, communityName }) => {
   const dispatch = useDispatch();
-  if (!community || !user) return null;
+  const [showInappropriateContentModal, setShowInappropriateContentModal] =
+    useState(false);
+  const [showTopicConflictModal, setShowTopicConflictModal] = useState(false);
+  const [
+    showEligibilityDetectionFailModal,
+    setShowEligibilityDetectionFailModal,
+  ] = useState(false);
 
-  const handleBodyChange = (event) => {
-    setBody(event.target.value);
+  const [formData, setFormData] = useState({
+    content: "",
+    file: null,
+    error: "",
+    loading: false,
+  });
+
+  const { isPostInappropriate, postCategory, confirmationToken } = useSelector(
+    (state) => ({
+      isPostInappropriate: state.posts?.isPostInappropriate,
+      postCategory: state.posts?.postCategory,
+      confirmationToken: state.posts?.confirmationToken,
+    })
+  );
+
+  const handleContentChange = (event) => {
+    setFormData({
+      ...formData,
+      content: event.target.value,
+    });
   };
-
-  const allowedFileTypes = /^image\/|video\//;
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (
       selectedFile &&
-      allowedFileTypes.test(selectedFile.type) &&
-      selectedFile.size <= 50 * 1024 * 1024
+      selectedFile.size <= 50 * 1024 * 1024 // 50MB
     ) {
-      setFile(selectedFile);
-      setError("");
+      setFormData({
+        ...formData,
+        file: selectedFile,
+        error: "",
+      });
     } else {
-      setFile(null);
-      setError(
-        "Invalid file type or size. Please select an image or video file under 50MB."
-      );
+      setFormData({
+        ...formData,
+        file: null,
+        error: "Please select an image or video file under 50MB.",
+      });
     }
   };
+
+  useEffect(() => {
+    if (isPostInappropriate) {
+      setShowInappropriateContentModal(true);
+    }
+
+    if (postCategory) {
+      setShowTopicConflictModal(true);
+    }
+
+    if (confirmationToken) {
+      setShowEligibilityDetectionFailModal(true);
+    }
+  }, [isPostInappropriate, postCategory, confirmationToken]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (error || loading) return;
+    const { content, file, loading } = formData;
+    if (loading) return;
 
-    if (!body && !file) {
-      setError("Please enter a message or select a file.");
+    if (!content && !file) {
+      setFormData({
+        ...formData,
+        error: "Please enter a message or select a file.",
+      });
       return;
     }
 
-    const formData = new FormData();
-    formData.append("body", body);
-    formData.append("community", community._id);
-    formData.append("user", user._id);
-    formData.append("file", file);
-    setLoading(true);
+    const newPost = new FormData();
+    newPost.append("content", content);
+    newPost.append("communityId", communityId);
+    newPost.append("communityName", communityName);
+    newPost.append("file", file);
+
+    setFormData({
+      ...formData,
+      loading: true,
+    });
 
     try {
-      await dispatch(createPostAction(formData));
-      await dispatch(getPostsAction());
-      await dispatch(getComPostsAction(community._id));
-      setBody("");
-      setFile(null);
+      await dispatch(createPostAction(newPost));
+      setFormData({
+        content: "",
+        file: null,
+        error: "",
+        loading: false,
+      });
       event.target.reset();
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
+      setFormData({
+        ...formData,
+        loading: false,
+      });
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 shadow-xl shadow-[#F3F8FF]">
-      <div className="mb-4">
-        <label htmlFor="body" className="block text-gray-700 font-bold mb-2">
-          Share something with your community:
-        </label>
-        <textarea
-          name="body"
-          id="body"
-          value={body}
-          onChange={handleBodyChange}
-          className="resize-none border rounded-md p-2 w-full"
-        />
-      </div>
+    <>
+      <InappropriatePostModal
+        closeInappropriateContentModal={() => {
+          setShowInappropriateContentModal(false);
+          dispatch(clearCreatePostFail());
+        }}
+        showInappropriateContentModal={showInappropriateContentModal}
+        contentType={"post"}
+      />
 
-      <div className="mb-4">
-        <label htmlFor="file" className="block text-gray-700 font-bold mb-2">
-          Image/Video:
-        </label>
-        <input
-          name="file"
-          type="file"
-          id="file"
-          accept="image/*, video/*"
-          onChange={handleFileChange}
-          className="border rounded-md p-2 w-full"
-        />
-        {error && <p className="text-red-500">{error}</p>}
-      </div>
+      <TopicConflictModal
+        closeTopicConflictModal={() => {
+          setShowTopicConflictModal(false);
+          dispatch(clearCreatePostFail());
+        }}
+        showTopicConflictModal={showTopicConflictModal}
+        communityName={postCategory?.community}
+        recommendedCommunity={postCategory?.recommendedCommunity}
+      />
 
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        type="submit"
-        disabled={loading || (!body && !file)}
-        style={{ display: body || file ? "block" : "none" }}
+      <EligibilityDetectionFailModal
+        closeEligibilityDetectionFailModal={() => {
+          setShowEligibilityDetectionFailModal(false);
+          dispatch(clearCreatePostFail());
+        }}
+        showEligibilityDetectionFailModal={showEligibilityDetectionFailModal}
+        confirmationToken={confirmationToken}
+      />
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-lg p-6 shadow-xl shadow-[#F3F8FF]"
       >
-        {loading ? "Loading..." : "Post"}
-      </button>
-    </form>
+        <div className="mb-4">
+          <label
+            htmlFor="content"
+            className="block text-gray-700 font-bold mb-2"
+          >
+            Share something with your community:
+          </label>
+          <textarea
+            className="resize-none border rounded-md p-2 w-full"
+            name="content"
+            id="content"
+            value={formData.content}
+            onChange={handleContentChange}
+            minLength={10}
+            maxLength={3000}
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+        <label
+            htmlFor="file"
+            className="flex items-center px-3 py-3 mx-auto mt-6 text-center bg-white border-2 border-dashed rounded-lg cursor-pointer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6 text-gray-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+            <h2 className="mx-3 text-gray-400">Photos / Videos</h2>
+            <input
+             name="file"
+             type="file"
+             id="file"
+             accept="image/*, video/*"
+             onChange={handleFileChange}
+             className="hidden"
+            />
+          </label>
+         
+          {formData.error && <p className="text-red-500">{formData.error}</p>}
+        </div>
+
+        <button
+          className={`bg-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
+            formData.loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          type="submit"
+          disabled={formData.loading || (!formData.content && !formData.file)}
+          style={{
+            display: formData.content || formData.file ? "block" : "none",
+          }}
+        >
+          {formData.loading ? "Loading..." : "Post"}
+        </button>
+      </form>
+    </>
   );
 };
 

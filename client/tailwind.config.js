@@ -16,11 +16,8 @@ module.exports = {
       },
     },
     fontFamily: {
-      monoton: ["Monoton", "cursive"],
-      satoshi: ["Satoshi", "sans-serif"],
-      clash: ["Clash Display", "sans-serif"],
-      infinite: ["Outfit", "sans-serif"],
-      bebasneo: ["Bebas Neue", "cursive"],
+      helvetica: ["Helvetica", "sans-serif"],
+      sans: ["Colfax Regular", "sans-serif"],
     },
     extend: {
       boxShadow: {
@@ -34,30 +31,27 @@ module.exports = {
       },
 
       colors: {
-        bg: {
+        background: {
           DEFAULT: "#F6F7FA",
           200: "#272727",
           300: "#2e2e2e",
         },
         primary: {
-          DEFAULT: "#3b82f6",
-          50: "#F7C6C6",
-          100: "#F5B4B4",
-          200: "#F09090",
-          300: "#EC6C6C",
-          400: "#E74848",
-          500: "#DA1E37",
-          600: "#B61818",
-          700: "#841212",
-          800: "#530B0B",
-          900: "#210404",
+          DEFAULT: "#008cff",
+          50: "#63ceff",
+          100: "#23b7fc",
+          200: "#00bfff",
+          300: "#00aeff",
+          400: "#0099ff",
+          500: "#008cff",
+          600: "#0067FF",
+          700: "#0040ff",
+          800: "#0e4bff",
+          900: "#0000ff",
         },
       },
     },
   },
 
-  plugins: [
-    require("@tailwindcss/line-clamp"),
-    require("tw-elements/dist/plugin"),
-  ],
+  plugins: [],
 };

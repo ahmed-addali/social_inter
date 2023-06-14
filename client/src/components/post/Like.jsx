@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { HiOutlineHandThumbUp, HiHandThumbUp } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -37,9 +37,9 @@ const Like = ({ post }) => {
 
     try {
       if (likeState.liked) {
-        dispatch(unlikePostAction(_id, userData._id));
+        dispatch(unlikePostAction(_id));
       } else {
-        dispatch(likePostAction(_id, userData._id));
+        dispatch(likePostAction(_id));
       }
     } catch (error) {
       setLikeState((prevState) => ({
@@ -51,15 +51,17 @@ const Like = ({ post }) => {
   };
 
   return (
-    <>
-      <button
-        onClick={toggleLike}
-        className="flex items-center text-xl cursor-pointer gap-1"
-      >
-        {likeState.liked ? <HiHandThumbUp /> : <HiOutlineHandThumbUp />}{" "}
-        {likeState.localLikes}
-      </button>
-    </>
+    <button
+      onClick={toggleLike}
+      className="flex items-center cursor-pointer gap-1 text-lg"
+    >
+      {likeState.liked ? (
+        <HiHandThumbUp className="text-2xl" />
+      ) : (
+        <HiOutlineHandThumbUp className="text-2xl" />
+      )}{" "}
+      {likeState.localLikes}
+    </button>
   );
 };
 

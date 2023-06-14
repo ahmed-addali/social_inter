@@ -1,14 +1,14 @@
-import React from "react";
 import { useNavigate, useLocation } from "react-router";
+import { useMemo } from "react";
 
 const PostOnProfile = ({ post }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { body, fileUrl, community, createdAt, comments, likes, isMember } =
+  const { content, fileUrl, community, createdAt, comments, likes, isMember } =
     post;
 
-  const isImageFile = React.useMemo(() => {
+  const isImageFile = useMemo(() => {
     const validExtensions = [".jpg", ".png", ".jpeg", ".gif", ".webp", ".svg"];
     const fileExtension = fileUrl?.slice(fileUrl.lastIndexOf("."));
     return validExtensions.includes(fileExtension);
@@ -16,7 +16,7 @@ const PostOnProfile = ({ post }) => {
 
   return (
     <div
-      className={`bg-white rounded-md p-4 shadow-md my-2 cursor-pointer ${
+      className={`bg-white rounded-md p-4 border my-2 cursor-pointer ${
         isMember ? "" : "opacity-50 pointer-events-none"
       }`}
       onClick={() => {
@@ -35,18 +35,18 @@ const PostOnProfile = ({ post }) => {
         </div>
       </div>
       <div className="my-3">
-        {body && <p className="text-lg mb-4">{body}</p>}
+        {content && <p className="mb-4">{content}</p>}
         {fileUrl && isImageFile ? (
           <img
-            className="w-[800px] h-auto rounded-xl my-3"
+            className="w-[800px] h-auto rounded-md my-3"
             src={fileUrl}
-            alt={body}
+            alt={content}
             loading="lazy"
           />
         ) : (
           fileUrl && (
             <video
-              className="w-[800px] h-auto rounded-xl my-3"
+              className="w-[800px] h-auto rounded-md my-3"
               src={fileUrl}
               controls
             />

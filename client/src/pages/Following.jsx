@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Leftbar from "../components/home/LeftBar";
-import Rightbar from "../components/home/RightBar";
-import PublicProfileCard from "../components/profile/PublicProfileCard";
 import { useSelector, useDispatch } from "react-redux";
 import { getFollowingUsersAction } from "../redux/actions/userActions";
-import Navbar from "../components/home/Navbar";
+import PublicProfileCard from "../components/profile/PublicProfileCard";
+import CommonLoading from "../components/loader/CommonLoading";
 
 const Following = () => {
   const dispatch = useDispatch();
@@ -20,30 +18,37 @@ const Following = () => {
 
     fetchFollowingUsers();
   }, [dispatch]);
+
   return (
-    <div className="bg-[#F6F7FA]">
-    <Navbar />
-    <div className="flex lg:px-40 mx-auto bg-[#F6F7FA]">
-      <Leftbar />
-      <div className="w-6/12 px-10 py-6">
-        <h2 className="text-xl font-bold mb-4">People you're following</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
-          {loading ? (
-            <div>Loading...</div>
-          ) : followingUsers?.length > 0 ? (
-            followingUsers.map((user) => (
-              <PublicProfileCard key={user._id} user={user} />
-            ))
-          ) : (
-            <div className="text-gray-500 text-center py-10">
-              You're not following anyone yet.
+    <div className="main-section bg-white border">
+      {loading ? (
+        <div className="flex items-center justify-center h-screen">
+          <CommonLoading />
+        </div>
+      ) : (
+        <div>
+          <h2 className="font-semibold text-gray-700 mb-4 text-center border-b py-3">
+            People you're following
+          </h2>
+          {followingUsers?.length > 0 ? (
+            <div className="grid grid-cols-2 gap-5 items-center px-3 py-3">
+              {followingUsers.map((user) => (
+                <PublicProfileCard key={user._id} user={user} />
+              ))}
             </div>
+          ) : (
+            <div className="text-center text-gray-700 flex justify-center items-center flex-col">
+             
+            <img className="" src="/nofollow.jpg" alt="no post" />
+            <p className="text-lg font-semibold py-5">You're not following anyone yet.
+            later!</p>
+          </div>
+           
           )}
         </div>
-      </div>
-      <Rightbar />
-    </div>
+      )}
     </div>
   );
 };
+
 export default Following;
