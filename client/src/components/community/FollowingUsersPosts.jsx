@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getFollowingUsersPostsAction } from "../../redux/actions/postActions";
 import CommonLoading from "../loader/CommonLoading";
 import Post from "../post/Post";
+import NoPost from "../../assets/nopost.jpg";
 
 const MemoizedPost = memo(Post);
 
@@ -44,10 +45,11 @@ const FollowingUsersPosts = ({ communityData }) => {
             <div>{memoizedFollowingUsersPost}</div>
           ) : (
             <div className="text-center text-gray-700 flex justify-center items-center flex-col">
-             
-              <img src="/nopost.jpg" alt="no post" />
-              <p className="text-lg font-semibold py-5">None of your following users have posted anything yet. Check back
-              later!</p>
+              <img src={NoPost} alt="no post" />
+              <p className="text-lg font-semibold py-5">
+                None of your following users have posted anything yet. Check
+                back later!
+              </p>
             </div>
           )}
         </>
