@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  HiOutlineArchiveBox,
-  HiOutlineInformationCircle,
-} from "react-icons/hi2";
+import { HiOutlineArchiveBox } from "react-icons/hi2";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { getCommunityAction } from "../../redux/actions/communityActions";
@@ -16,6 +13,8 @@ import CommonLoading from "../loader/CommonLoading";
 import "react-photo-view/dist/react-photo-view.css";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import ReportPostModal from "../modals/ReportPostModal";
+import { VscReport } from "react-icons/vsc";
+import Tooltip from "../shared/Tooltip";
 const PostView = ({ post, userData }) => {
   const [loading, setLoading] = useState(true);
 
@@ -43,9 +42,6 @@ const PostView = ({ post, userData }) => {
   const toggleModal = (value) => {
     setShowModal(value);
   };
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isReportedPost, setIsReportedPost] = useState(isReported);
@@ -67,18 +63,18 @@ const PostView = ({ post, userData }) => {
   }
 
   return (
-    <div className="main-section border p-5 bg-white shadow-2xl shadow-[#f2f5fc]">
+    <div className="main-section border p-5 bg-white">
       <p className="border border-dashed border-primary cursor-pointer px-2 py-2 w-7 h-7 flex justify-center items-center mb-3 rounded-full">
         <IoIosArrowBack
           className="text-primary text-sm font-semibold"
-          onClick={handleBack}
+          onClick={() => navigate(location.state?.from || "/")}
         />
       </p>
 
       <div className="flex justify-between">
         <div className="flex gap-2">
           <img
-            className="rounded-md overflow-hidden w-10"
+            className="rounded-full overflow-hidden w-[50px] h-[50px] object-cover"
             src={user.avatar}
             alt="user avatar"
             loading="lazy"
@@ -120,7 +116,7 @@ const PostView = ({ post, userData }) => {
             >
               <PhotoView src={fileUrl}>
                 <img
-                  className="w-full h-auto rounded-md mt-3 cursor-pointer"
+                  className="w-full aspect-square object-cover rounded-md mt-3 cursor-pointer"
                   src={fileUrl}
                   alt={content}
                   loading="lazy"
@@ -130,7 +126,7 @@ const PostView = ({ post, userData }) => {
           ) : (
             fileUrl && (
               <video
-                className="max-w-sm h-auto rounded-md mt-3"
+                className="w-full aspect-video rounded-md mt-3"
                 src={fileUrl}
                 controls
               />
@@ -148,43 +144,36 @@ const PostView = ({ post, userData }) => {
           <div className="flex items-center space-x-2">
             <Save postId={post._id} />
 
-            <span
-              className="transititext-black flex items-center gap-1 text-lg text-black transition duration-150 ease-in-out  "
-              data-te-toggle="tooltip"
-              title=" Saved By"
-            >
-              <HiOutlineArchiveBox className="text-2xl" />
-              {savedByCount}
-            </span>
-            {isReportedPost ? (
-              <button
-                disabled
-                className="transititext-black  text-black transition duration-150 ease-in-out "
-                data-te-toggle="tooltip"
-                title="Hi! I'm tooltip"
-              >
-                <HiOutlineInformationCircle className="text-2xl" />
-                <span className="text-xs md:text-base">Reported</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleReportClick}
-                className="transititext-amber-500 text-amber-500 transition duration-150 ease-in-out "
-                data-te-toggle="tooltip"
-                title="Report"
-              >
-                <HiOutlineInformationCircle className="text-2xl" />
-              </button>
-            )}
-            {userData?._id === post.user._id && (
-              <button
-                onClick={() => toggleModal(true)}
-                className="transititext-red-500 text-red-500 transition duration-150 ease-in-out "
-                data-te-toggle="tooltip"
-                title="Delete"
-              >
+            <Tooltip text="Saved by">
+              <span className="flex justify-center items-center">
                 <HiOutlineArchiveBox className="text-2xl" />
-              </button>
+                {savedByCount}
+              </span>
+            </Tooltip>
+
+            {isReportedPost ? (
+              <Tooltip text="Reported">
+                <button disabled className="text-green-500">
+                  <VscReport className="text-2xl" />
+                </button>
+              </Tooltip>
+            ) : (
+              <Tooltip text="Report">
+                <button onClick={handleReportClick}>
+                  <VscReport className="text-2xl" />
+                </button>
+              </Tooltip>
+            )}
+
+            {userData?._id === post.user._id && (
+              <Tooltip text="Delete">
+                <button
+                  onClick={() => toggleModal(true)}
+                  className="text-red-500"
+                >
+                  <HiOutlineArchiveBox className="text-2xl" />
+                </button>
+              </Tooltip>
             )}
             {showModal && (
               <DeleteModal

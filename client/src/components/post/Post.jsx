@@ -9,6 +9,7 @@ import {
 import DeleteModal from "../modals/DeleteModal";
 import Like from "./Like";
 import "react-photo-view/dist/react-photo-view.css";
+import Tooltip from "../shared/Tooltip";
 
 const Post = ({ post }) => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Post = ({ post }) => {
   };
 
   return (
-    <div className="px-6 py-6 rounded-md border bg-white mb-6 hover:shadow duration-300 shadow-2xl shadow-[#f2f5fc]">
+    <div className="border rounded bg-white mb-6 hover:shadow duration-300 p-4 m-2">
       <div className="flex items-start justify-between">
         <div className="flex gap-2">
           <img
@@ -83,7 +84,7 @@ const Post = ({ post }) => {
                   src={fileUrl}
                   alt={content}
                   loading="lazy"
-                  className="cursor-pointer h-auto rounded-md mt-3"
+                  className="cursor-pointer w-full aspect-square object-cover rounded-md mt-3"
                 />
               </PhotoView>
             </PhotoProvider>
@@ -113,13 +114,15 @@ const Post = ({ post }) => {
         <div className="flex justify-center items-center gap-4 cursor-pointer">
           <div className="flex items-center gap-2">
             {userData?._id === post.user._id && (
-              <button
-                onClick={() => toggleModal(true)}
-                className="flex items-center text-xl gap-1"
-              >
-                {" "}
-                <HiOutlineArchiveBox className="text-red-500 text-2xl" />
-              </button>
+              <Tooltip text="Delete post">
+                <button
+                  onClick={() => toggleModal(true)}
+                  className="flex items-center text-xl gap-1"
+                >
+                  {" "}
+                  <HiOutlineArchiveBox className="text-red-500 text-2xl" />
+                </button>
+              </Tooltip>
             )}
           </div>
         </div>
