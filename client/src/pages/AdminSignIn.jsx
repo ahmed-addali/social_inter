@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import logo from "../assets/SocialEcho.png";
+import logo from "../assets/SocialInter.png";
 import { useState } from "react";
 import ButtonLoadingSpinner from "../components/loader/ButtonLoadingSpinner";
 import { IoIosArrowRoundBack } from "react-icons/io";
