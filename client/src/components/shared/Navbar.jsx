@@ -8,7 +8,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { Transition } from "@headlessui/react";
 import { AiOutlineBars } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
-import Logo from "../../assets/SocialEcho.png";
+import Logo from "../../assets/SocialInter.png";
 
 const Navbar = ({ userData, toggleLeftbar, showLeftbar }) => {
   const dispatch = useDispatch();

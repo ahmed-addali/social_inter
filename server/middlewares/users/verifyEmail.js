@@ -38,10 +38,14 @@ const sendVerificationEmail = async (req, res) => {
     });
 
     let info = await transporter.sendMail({
-      from: `"SocialEcho" <${USER}>`,
+      from: `"SocialInter" <${USER}>`,
       to: email,
-      subject: "Verify your email address",
-      html: verifyEmailHTML(name, verificationLink, verificationCode),
+      subject: "Email Verification",
+      html: verifyEmailHTML(
+        name,
+        `${CLIENT_URL}/verify-email?code=${verificationCode}&email=${email}`,
+        verificationCode
+      ),
     });
 
     const newVerification = new EmailVerification({
