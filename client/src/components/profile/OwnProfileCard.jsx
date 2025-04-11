@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { RiEditCircleLine } from "react-icons/ri";
-import { CiLocationOn } from "react-icons/ci";
+import { CiEdit, CiLocationOn } from "react-icons/ci";
 import { GrContactInfo } from "react-icons/gr";
 import { useState } from "react";
 import ProfileUpdateModal from "../modals/ProfileUpdateModal";
+import Tooltip from "../shared/Tooltip";
 
 const OwnProfileCard = ({ user }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,21 +17,24 @@ const OwnProfileCard = ({ user }) => {
   };
 
   return (
-    <div className="bg-white rounded-md p-6 border">
-      <div className="flex flex-col justify-between items-center ">
-        <div className="  flex flex-col justify-center items-center">
-          <div className="relative">
+    <div className="rounded-md border bg-white p-6">
+      <div
+        className="flex cursor-pointer justify-end text-xl"
+        onClick={handleOpenModal}
+      >
+        <Tooltip text="Edit profile">
+          <CiEdit />
+        </Tooltip>
+      </div>
+      <div className="flex flex-col items-center justify-between">
+        <div className="flex flex-col items-center justify-center">
+          <div className="">
             <img
-              className="w-28 h-28 rounded-full mr-4"
+              className="mr-4 h-28 w-28 rounded-full object-cover"
               src={user.avatar}
               alt="Profile"
             ></img>
-            <span
-              onClick={handleOpenModal}
-              className="bg-primary py-3  px-3 rounded-full absolute -bottom-2 shadow-lg hover:bg-blue-700 right-3"
-            >
-              <RiEditCircleLine className="text-lg text-white" />
-            </span>
+
             <ProfileUpdateModal
               user={user}
               isOpen={isModalOpen}
@@ -40,14 +43,14 @@ const OwnProfileCard = ({ user }) => {
           </div>
 
           <div>
-            <h2 className="text-lg font-bold text-center mt-5">{user.name}</h2>
+            <h2 className="mt-5 text-center text-lg font-bold">{user.name}</h2>
             {user.bio ? (
-              <p className="text-gray-600 flex items-center justify-center gap-2">
+              <p className="flex items-center justify-center gap-2 text-gray-600">
                 <GrContactInfo className="text-gray-500" />
                 {user.bio}
               </p>
             ) : (
-              <p className="text-gray-400 flex items-center justify-center gap-2">
+              <p className="flex items-center justify-center gap-2 text-gray-400">
                 <GrContactInfo className="text-gray-500" />
                 Bio not added
               </p>
@@ -56,44 +59,45 @@ const OwnProfileCard = ({ user }) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col justify-start my-3">
+      <div className="my-3 flex flex-col justify-start">
         <p className="font-semibold">Location</p>
         {user.location ? (
-          <p className="text-gray-700 flex gap-2 items-center">
+          <p className="flex items-center gap-2 text-gray-700">
             <CiLocationOn className="font-semibold" />
             {user.location}
           </p>
         ) : (
-          <p className="text-gray-400 flex items-center gap-2">
+          <p className="flex items-center gap-2 text-gray-400">
             <CiLocationOn className="text-lg font-semibold" />
             Location not added
           </p>
         )}
       </div>
 
-      <div className="">
-        <h3 className="font-bold">Interests</h3>
+      <div className="mt-4 h-20 overflow-y-auto">
+        <h3 className="font-bold text-xl mb-2">Interests</h3>
         {user.interests ? (
-          <ul className="flex items-center gap-2 mt-2">
+          <div className="flex flex-wrap gap-2">
             {user.interests.split(",").map((interest, i) => (
-              <li
+              <span
                 key={i}
-                className="border border-primary rounded-full p-1 text-primary text-sm"
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 {interest.trim()}
-              </li>
+              </span>
             ))}
-          </ul>
+          </div>
         ) : (
-          <p className="text-gray-600">
+          <p className="text-gray-600 mt-2">
             No interests have been set yet. Add some interests to let people
             know more about you.
           </p>
         )}
       </div>
-      <span className="flex flex-col justify-center items-center mt-3 border-t">
+
+      <span className="mt-3 flex flex-col items-center justify-center border-t">
         <Link
-          className="text-primary mt-3 cursor-pointer hover:underline"
+          className="mt-3 cursor-pointer text-primary hover:underline"
           to="/devices-locations"
         >
           Manage Devices and Locations

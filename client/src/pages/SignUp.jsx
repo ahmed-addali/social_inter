@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { signUpAction } from "../redux/actions/authActions";
+import { signUpAction, clearMessage } from "../redux/actions/authActions";
 import { Link } from "react-router-dom";
 import ContextAuthModal from "../components/modals/ContextAuthModal";
+import { RxCross1 } from "react-icons/rx";
 import ButtonLoadingSpinner from "../components/loader/ButtonLoadingSpinner";
-import Logo from "../assets/SocialEcho.png";
+import Logo from "../assets/SocialInter.png";
 
 const SignUpNew = () => {
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [avatarError, setAvatarError] = useState(null);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -26,7 +29,7 @@ const SignUpNew = () => {
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
 
-    if (e.target.value.includes("mod.socialecho.com")) {
+    if (e.target.value.includes("mod.SocialInter.com")) {
       setIsModerator(true);
     } else {
       setIsModerator(false);
@@ -67,6 +70,7 @@ const SignUpNew = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setLoadingText("Signing up...");
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", email);
@@ -74,49 +78,67 @@ const SignUpNew = () => {
     formData.append("avatar", avatar);
     formData.append("role", "general");
     formData.append("isConsentGiven", isConsentGiven.toString());
+
+    const timeout = setTimeout(() => {
+      setLoadingText(
+        "This is taking longer than usual. Please wait while backend services are getting started."
+      );
+    }, 5000);
+
     await dispatch(signUpAction(formData, navigate, isConsentGiven, email));
     setLoading(false);
     setIsConsentGiven(false);
+    clearTimeout(timeout);
+  };
+
+  const handleClearError = () => {
+    dispatch(clearMessage());
   };
 
   return (
     <section className="bg-white">
-      <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
+      <div className="container mx-auto flex min-h-screen items-center justify-center px-6">
         <form className="w-full max-w-md" onSubmit={handleSubmit}>
-          <div className="flex justify-center mx-auto">
-            <img className="w-auto h-7 sm:h-8" src={Logo} alt="" />
+          <div className="mx-auto flex justify-center">
+            <img className="h-7 w-auto sm:h-8" src={Logo} alt="" />
           </div>
           {signUpError &&
             Array.isArray(signUpError) &&
             signUpError.map((err, i) => (
               <div
-                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-6"
+                className="mt-6 flex items-center rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
                 role="alert"
                 key={i}
               >
-                <strong className="font-bold"> Error! </strong>
-                <span className="block sm:inline ml-2 mr-2">{err}</span>
+                <span className="ml-2 block sm:inline">{err}</span>
+                <button
+                  className="ml-auto font-bold text-red-700"
+                  onClick={handleClearError}
+                >
+                  <RxCross1 className="h-3 w-3" />
+                </button>
               </div>
             ))}
-          <div className="flex items-center justify-center mt-6">
+
+          <div className="mt-6 flex items-center justify-center">
             <Link
               to={"/signin"}
-              className="w-1/3 pb-4 font-medium text-center text-gray-500 capitalize border-b border-gray-400 text-gray-300"
+              className="w-1/3 border-b border-gray-400 pb-4 text-center font-medium text-gray-800"
             >
-              sign in
+              Sign In
             </Link>
             <Link
               to={"/signup"}
-              className="w-1/3 pb-4 font-medium text-center text-gray-800 capitalize border-b-2 border-blue-500 text-gray-300"
+              className="text-cente w-1/3 border-b-2 border-blue-500 pb-4 font-medium text-gray-800"
             >
-              sign up
+              Sign Up
             </Link>
           </div>
-          <div className="relative flex items-center mt-8">
+          <div className="relative mt-8 flex items-center">
             <span className="absolute">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6 mx-3 text-gray-300"
+                className="mx-3 h-6 w-6 text-gray-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -135,18 +157,19 @@ const SignUpNew = () => {
               type="text"
               value={name}
               onChange={handleNameChange}
-              className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
               placeholder="Username"
               required
+              autoComplete="off"
             />
           </div>
           <label
             htmlFor="avatar"
-            className="flex items-center px-3 py-3 mx-auto mt-6 text-center bg-white border-2 border-dashed rounded-lg cursor-pointer"
+            className="mx-auto mt-6 flex cursor-pointer items-center rounded-lg border-2 border-dashed bg-white px-3 py-3 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-gray-300"
+              className="h-6 w-6 text-gray-300"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -166,25 +189,25 @@ const SignUpNew = () => {
               name="avatar"
               accept="image/*"
               onChange={handleAvatarChange}
-              required
+              autoComplete="off"
             />
           </label>
           {avatar && (
-            <div className="flex items-center justify-center mt-2">
+            <div className="mt-2 flex items-center justify-center">
               <span className="font-medium text-blue-500">{avatar.name}</span>
             </div>
           )}
           {avatarError && (
-            <div className="flex items-center justify-center mt-2">
+            <div className="mt-2 flex items-center justify-center">
               <span className="text-red-500">{avatarError}</span>
             </div>
           )}
 
-          <div className="relative flex items-center mt-6">
+          <div className="relative mt-6 flex items-center">
             <span className="absolute">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6 mx-3 text-gray-300"
+                className="mx-3 h-6 w-6 text-gray-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -203,16 +226,17 @@ const SignUpNew = () => {
               value={email}
               onChange={handleEmailChange}
               type="email"
-              className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
               placeholder="Email address"
               required
+              autoComplete="off"
             />
           </div>
-          <div className="relative flex items-center mt-4">
+          <div className="relative mt-4 flex items-center">
             <span className="absolute">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6 mx-3 text-gray-300"
+                className="mx-3 h-6 w-6 text-gray-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -231,21 +255,22 @@ const SignUpNew = () => {
               type="password"
               value={password}
               onChange={handlePasswordChange}
-              className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-10 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
               placeholder="Password"
               required
+              autoComplete="off"
             />
           </div>
           <div className="mt-6">
             <button
               disabled={loading}
               type="submit"
-              className={`w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
+              className={`w-full transform rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white transition-colors duration-300 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 ${
+                loading ? "cursor-not-allowed opacity-50" : ""
               }`}
             >
               {loading ? (
-                <ButtonLoadingSpinner loadingText={"Signing Up..."} />
+                <ButtonLoadingSpinner loadingText={loadingText} />
               ) : (
                 <span>Sign Up</span>
               )}
@@ -253,15 +278,16 @@ const SignUpNew = () => {
 
             <div onClick={() => setIsModalOpen(true)} className="mt-6">
               {isConsentGiven && !isModerator ? (
-                <p className="mt-2 text-center font-bold text-sm text-green-600 cursor-pointer">
-                  Context-Based Authentication is enabled.
+                <p className="mt-2 cursor-pointer rounded-lg border border-green-500 px-4 py-3 text-center text-sm font-semibold text-green-600">
+                  Context-Based Authentication is enabled
                 </p>
               ) : (
-                <p className="mt-2 text-center font-bold text-sm text-orange-400 cursor-pointer">
-                  Context-Based Authentication is disabled.
+                <p className="mt-2 cursor-pointer rounded-lg border px-4 py-3 text-center text-sm font-semibold">
+                  Context-Based Authentication is disabled
                 </p>
               )}
             </div>
+
             <div>
               <ContextAuthModal
                 isModalOpen={isModalOpen}

@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useLocation } from "react-router";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   getPublicUserAction,
   getPublicUsersAction,
@@ -9,12 +8,12 @@ import {
   followUserAction,
 } from "../redux/actions/userActions";
 import PublicPost from "../components/profile/PublicPost";
-import LoadingSpinner from "../components/loader/ButtonLoadingSpinner";
 import { CiLocationOn } from "react-icons/ci";
 import { AiOutlineFieldTime } from "react-icons/ai";
 import { FiUsers, FiUser, FiUserMinus, FiUserPlus } from "react-icons/fi";
 import { HiOutlineDocumentText } from "react-icons/hi2";
 import CommonLoading from "../components/loader/CommonLoading";
+import Tooltip from "../components/shared/Tooltip";
 
 const PublicProfile = () => {
   const location = useLocation();
@@ -59,7 +58,7 @@ const PublicProfile = () => {
 
   if (!userProfile) {
     return (
-      <div className="col-span-2 flex justify-center items-center">
+      <div className="col-span-2 flex items-center justify-center">
         <CommonLoading />
       </div>
     );
@@ -83,38 +82,48 @@ const PublicProfile = () => {
     commonCommunities,
   } = userProfile;
 
-  const FollowButton = ({ loading, onClick }) => (
+  const Button = ({ loading, onClick, tooltipText, icon, color }) => (
     <button
       onClick={onClick}
       type="button"
-      className="bg-white absolute right-0 bottom-0 text-primary border border-primary rounded-full py-2 px-2 text-sm font-semibold"
-    >
-      {loading ? <LoadingSpinner loadingText="Following..." /> : <FiUserPlus />}
-    </button>
-  );
-
-  const UnfollowButton = ({ loading, onClick }) => (
-    <button
-      onClick={onClick}
-      type="button"
-      className="bg-white absolute right-0 bottom-0 text-red-500 border border-red-500 rounded-full py-2 px-2 text-sm font-semibold"
-      disabled={isModerator}
+      className={`absolute bottom-0 right-0 h-9 w-9 rounded-full border px-2 py-2 text-sm font-semibold ${color} bg-white`}
+      disabled={loading}
     >
       {loading ? (
-        <LoadingSpinner loadingText="Unfollowing..." />
+        <span className="text-xs">Wait</span>
       ) : (
-        <FiUserMinus />
+        <Tooltip text={tooltipText}>{icon}</Tooltip>
       )}
     </button>
   );
 
+  const FollowButton = ({ loading, onClick, name }) => (
+    <Button
+      loading={loading}
+      onClick={onClick}
+      tooltipText={`Follow ${name}`}
+      icon={<FiUserPlus />}
+      color="text-primary border-primary"
+    />
+  );
+
+  const UnfollowButton = ({ loading, onClick, name }) => (
+    <Button
+      loading={loading}
+      onClick={onClick}
+      tooltipText={`Unfollow ${name}`}
+      icon={<FiUserMinus />}
+      color="text-red-500 border-red-500"
+    />
+  );
+
   return (
     <div className="main-section">
-      <div className="bg-white px-6 py-6 border rounded">
+      <div className="rounded border bg-white px-6 py-6">
         <div className="flex flex-col items-center justify-center bg-white py-6">
           <div className="relative">
             <img
-              className="h-20 w-20 rounded-full object-cover mr-4"
+              className="mr-4 h-20 w-20 rounded-full object-cover"
               src={avatar}
               alt="Profile"
               loading="lazy"
@@ -122,33 +131,35 @@ const PublicProfile = () => {
             <UnfollowButton
               loading={unfollowLoading}
               onClick={() => handleUnfollow(publicUserId)}
+              name={name}
             />
             {!isModerator && !isFollowing && (
               <FollowButton
                 loading={followLoading}
                 onClick={() => handleFollow(publicUserId)}
+                name={name}
               />
             )}
           </div>
         </div>
 
         <div>
-          <h1 className="text-lg text-center capitalize font-bold mt-3">
+          <h1 className="mt-3 text-center text-lg font-bold capitalize">
             {name}
           </h1>
-          <p className="text-gray-500 text-center flex justify-center items-center ga-2">
+          <p className="ga-2 flex items-center justify-center text-center text-gray-500">
             <CiLocationOn className="text-lg" />
-            {userLocation}
+            {userLocation === "" ? "N/A" : userLocation}
           </p>
           {role === "moderator" ? (
-            <p className="text-sky-700 text-center text-sm font-semibold bg-sky-200 rounded-md py-1 px-2">
+            <p className="rounded-md bg-sky-200 px-2 py-1 text-center text-sm font-semibold text-sky-700">
               Moderator
             </p>
           ) : null}
         </div>
         <div>
           <p>{bio}</p>
-          <p className="flex gap-2 items-center">
+          <p className="flex items-center gap-2">
             <AiOutlineFieldTime />
             Joined on {joinedOn}
           </p>
@@ -156,7 +167,7 @@ const PublicProfile = () => {
             <HiOutlineDocumentText />
             {totalPosts} posts
           </p>
-          <p className="flex gap-2 items-center">
+          <p className="flex items-center gap-2">
             <FiUsers />
             {totalCommunities === 0
               ? "Not a member of any communities"
@@ -164,7 +175,7 @@ const PublicProfile = () => {
               ? "1 community"
               : `${totalCommunities} communities`}
           </p>
-          <p className="flex gap-2 items-center">
+          <p className="flex items-center gap-2">
             <FiUser />
             {totalFollowing} following
           </p>
@@ -211,59 +222,53 @@ const PublicProfile = () => {
         {commonCommunities?.length === 0 ? (
           <p>You have no communities in common.</p>
         ) : (
-          <p className="flex items-start gap-2">
-            <FiUsers />
-            <>
-              You both are members of{" "}
-              {commonCommunities?.slice(0, 2).map((c, index) => (
-                <Fragment key={c._id}>
-                  <Link
-                    className="text-sky-700 font-bold hover:underline"
-                    to={`/community/${c.name}`}
-                  >
-                    {c.name}
-                  </Link>
-                  {index === 0 && commonCommunities.length > 2 ? ", " : ""}
-                  {index === 0 && commonCommunities.length > 1 ? " and " : ""}
-                </Fragment>
-              ))}
-              {commonCommunities?.length > 2 && (
-                <span>
-                  {" and "}
-                  <span className="tooltip">
-                    {`${commonCommunities?.length - 2} other ${
-                      commonCommunities?.length - 2 === 1
-                        ? "community"
-                        : "communities"
-                    }`}
-                    <span className="tooltiptext">
-                      {commonCommunities
-                        ?.slice(2)
-                        .map((c) => `${c.name}`)
-                        .join(", ")}
-                    </span>
+          <p>
+            You both are members of{" "}
+            {commonCommunities?.slice(0, 1).map((c) => (
+              <Fragment key={c._id}>
+                <Link
+                  className="font-bold text-sky-700 hover:underline"
+                  to={`/community/${c.name}`}
+                >
+                  {c.name}
+                </Link>
+              </Fragment>
+            ))}
+            {commonCommunities?.length > 1 && (
+              <span>
+                {" and "}
+                <span className="tooltip">
+                  {`${commonCommunities?.length - 1} other ${
+                    commonCommunities?.length - 1 === 1
+                      ? "community"
+                      : "communities"
+                  }`}
+                  <span className="tooltiptext">
+                    {commonCommunities
+                      ?.slice(1)
+                      .map((c) => `${c.name}`)
+                      .join(", ")}
                   </span>
                 </span>
-              )}
-            </>
+              </span>
+            )}
           </p>
         )}
-
         <div className="flex flex-col">
           <p className="mt-2 font-semibold">Interests </p>
           {interests ? (
-            <ul className="flex items-center gap-3">
+            <div className="flex flex-wrap gap-2">
               {interests.split(",").map((interest, i) => (
-                <li
+                <span
                   key={i}
-                  className="border mt-2 border-primary px-2 py-1 text-primary rounded-full"
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   {interest.trim()}
-                </li>
+                </span>
               ))}
-            </ul>
+            </div>
           ) : (
-            <p className="text-gray-500">No interests added</p>
+            <p className="text-gray-500">{name} has not added any interests.</p>
           )}
         </div>
       </div>

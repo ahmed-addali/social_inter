@@ -36,3 +36,11 @@ export const GET_USER_PREFERENCES_FAIL = "GET_USER_PREFERENCES_FAIL";
 export const ERROR_MESSAGE = "Something went wrong.";
 export const SIGNUP_SUCCESS_MESSAGE =
   "You have successfully created an account. Please sign in.";
+
+export const CLEAR_MESSAGE = "CLEAR_MESSAGE";
+
+export const SET_ACCESS_TOKEN = "SET_ACCESS_TOKEN";
+
+export const SET_REFRESH_TOKEN = "SET_REFRESH_TOKEN";
+
+export const SET_USER_DATA = "SET_USER_DATA";

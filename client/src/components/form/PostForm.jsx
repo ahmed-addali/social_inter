@@ -61,17 +61,9 @@ const PostForm = ({ communityId, communityName }) => {
   };
 
   useEffect(() => {
-    if (isPostInappropriate) {
-      setShowInappropriateContentModal(true);
-    }
-
-    if (postCategory) {
-      setShowTopicConflictModal(true);
-    }
-
-    if (confirmationToken) {
-      setShowEligibilityDetectionFailModal(true);
-    }
+    if (isPostInappropriate) setShowInappropriateContentModal(true);
+    if (postCategory) setShowTopicConflictModal(true);
+    if (confirmationToken) setShowEligibilityDetectionFailModal(true);
   }, [isPostInappropriate, postCategory, confirmationToken]);
 
   const handleSubmit = async (event) => {
@@ -115,6 +107,14 @@ const PostForm = ({ communityId, communityName }) => {
     }
   };
 
+  const handleRemoveFile = () => {
+    setFormData({
+      ...formData,
+      file: null,
+      error: "",
+    });
+  };
+
   return (
     <>
       <InappropriatePostModal
@@ -145,19 +145,16 @@ const PostForm = ({ communityId, communityName }) => {
         confirmationToken={confirmationToken}
       />
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-lg p-6 shadow-xl shadow-[#F3F8FF]"
-      >
+      <form onSubmit={handleSubmit} className="border-b bg-white p-6">
         <div className="mb-4">
           <label
             htmlFor="content"
-            className="block text-gray-700 font-bold mb-2"
+            className="mb-2 block font-bold text-gray-700"
           >
             Share something with your community:
           </label>
           <textarea
-            className="resize-none border rounded-md p-2 w-full"
+            className="w-full resize-none rounded-md border p-2"
             name="content"
             id="content"
             value={formData.content}
@@ -169,13 +166,13 @@ const PostForm = ({ communityId, communityName }) => {
         </div>
 
         <div className="mb-4">
-        <label
+          <label
             htmlFor="file"
-            className="flex items-center px-3 py-3 mx-auto mt-6 text-center bg-white border-2 border-dashed rounded-lg cursor-pointer"
+            className="mx-auto mt-6 flex cursor-pointer items-center rounded-lg border-2 border-dashed bg-white px-3 py-3 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-gray-300"
+              className="h-6 w-6 text-gray-300"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -187,23 +184,49 @@ const PostForm = ({ communityId, communityName }) => {
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
               />
             </svg>
-            <h2 className="mx-3 text-gray-400">Photos / Videos</h2>
+            <h2 className="mx-3 text-gray-400">Photo / Video</h2>
             <input
-             name="file"
-             type="file"
-             id="file"
-             accept="image/*, video/*"
-             onChange={handleFileChange}
-             className="hidden"
+              name="file"
+              type="file"
+              id="file"
+              accept="image/*, video/*"
+              onChange={handleFileChange}
+              className="hidden"
             />
           </label>
-         
+
+          {formData.file && (
+            <div className="mt-4 flex items-center justify-between">
+              <p className="text-gray-500">{formData.file.name}</p>
+              <button
+                type="button"
+                onClick={handleRemoveFile}
+                className="text-red-500 hover:text-red-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
+
           {formData.error && <p className="text-red-500">{formData.error}</p>}
         </div>
 
         <button
-          className={`bg-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
-            formData.loading ? "opacity-50 cursor-not-allowed" : ""
+          className={`rounded bg-primary px-4 py-1 text-sm text-white hover:bg-blue-700 ${
+            formData.loading ? "cursor-not-allowed opacity-50" : ""
           }`}
           type="submit"
           disabled={formData.loading || (!formData.content && !formData.file)}
@@ -211,7 +234,7 @@ const PostForm = ({ communityId, communityName }) => {
             display: formData.content || formData.file ? "block" : "none",
           }}
         >
-          {formData.loading ? "Loading..." : "Post"}
+          {formData.loading ? "Processing..." : "Create post"}
         </button>
       </form>
     </>
