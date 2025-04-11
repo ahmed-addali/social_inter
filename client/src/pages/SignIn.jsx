@@ -6,7 +6,7 @@ import { AiFillGithub } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import ButtonLoadingSpinner from "../components/loader/ButtonLoadingSpinner";
-import Logo from "../assets/SocialEcho.png";
+import Logo from "../assets/SocialInter.png";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
@@ -171,7 +171,7 @@ const SignIn = () => {
         </form>
         <span className="flex items-center justify-center py-4 text-sm text-gray-600 ">
           <a
-            href="https://github.com/nz-m/SocialEcho"
+            href="https://github.com/nz-m/SocialInter"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center hover:text-blue-500"
