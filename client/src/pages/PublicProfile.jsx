@@ -103,7 +103,7 @@ const PublicProfile = () => {
       onClick={onClick}
       tooltipText={`Follow ${name}`}
       icon={<FiUserPlus />}
-      color="text-primary border-primary"
+      color="text-purple-500 border-purple-800"
     />
   );
 
@@ -261,7 +261,7 @@ const PublicProfile = () => {
               {interests.split(",").map((interest, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                 >
                   {interest.trim()}
                 </span>

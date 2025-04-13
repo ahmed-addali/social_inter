@@ -82,7 +82,7 @@ const BlockedDevicesLocations = ({ blockedContextAuthData }) => {
                       className={`inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
                         loading[device._id]
                           ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
+                          : "bg-purple-500 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400"
                       }`}
                     >
                       {loading[device._id] ? (

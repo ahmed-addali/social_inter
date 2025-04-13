@@ -41,7 +41,7 @@ const LoginVerified = () => {
           You may not have been verified yet. Please check your email for a link
           to verify your account. If you have already verified your account,
           please try
-          <Link className="text-blue-500 font-bold" to="/signin">
+          <Link className="text-purple-500 font-bold" to="/signin">
             {" "}
             logging in{" "}
           </Link>

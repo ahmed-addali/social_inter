@@ -89,7 +89,7 @@ const Search = () => {
           value={inputValue}
           onChange={handleInputChange}
           placeholder="Search for people, posts or communities"
-          className="h-10 py-1 bg-white border w-full md:w-[660px] rounded-full text-sm shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-500 transition duration-300 pl-3 pr-10"
+          className="h-10 py-1 bg-white border w-full md:w-[660px] rounded-full text-sm shadow-sm focus:outline-none focus:shadow-outline-purple focus:border-purple-500 transition duration-300 pl-3 pr-10"
           aria-label="Search"
           autoComplete="off"
         />
@@ -123,7 +123,7 @@ const Search = () => {
                       navigate(`/post/${post._id}`);
                       clearValues();
                     }}
-                    className="block text-sm text-gray-700 hover:text-blue-500 cursor-pointer"
+                    className="block text-sm text-gray-700 hover:text-purple-500 cursor-pointer"
                   >
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
@@ -214,7 +214,7 @@ const Search = () => {
                         community={community}
                       />
                       <button
-                        className="bg-primary px-2 py-1 text-white text-sm rounded-md"
+                        className="bg-purple-500 px-2 py-1 text-white text-sm rounded-md"
                         onClick={() => toggleModal(true)}
                       >
                         Join
@@ -244,7 +244,7 @@ const Search = () => {
                   />
                 </div>
                 <div className="ml-3">
-                  <p className="font-semibold text-md text-primary">
+                  <p className="font-semibold text-md text-purple-500">
                     {joinedCommunity.name}
                   </p>
                   <p className="text-sm text-gray-600 line-clamp-2">

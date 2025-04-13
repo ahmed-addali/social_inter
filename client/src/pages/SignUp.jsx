@@ -99,8 +99,8 @@ const SignUpNew = () => {
     <section className="bg-white">
       <div className="container mx-auto flex min-h-screen items-center justify-center px-6">
         <form className="w-full max-w-md" onSubmit={handleSubmit}>
-          <div className="mx-auto flex justify-center">
-            <img className="h-7 w-auto sm:h-8" src={Logo} alt="" />
+          <div className="logo " style={{ width: '180px', margin: '0 auto 10px' }}>
+            <img  src={Logo} alt="" />
           </div>
           {signUpError &&
             Array.isArray(signUpError) &&
@@ -129,7 +129,7 @@ const SignUpNew = () => {
             </Link>
             <Link
               to={"/signup"}
-              className="text-cente w-1/3 border-b-2 border-blue-500 pb-4 font-medium text-gray-800"
+              className="text-cente w-1/3 border-b-2 border-purple-800 pb-4 font-medium text-gray-800"
             >
               Sign Up
             </Link>
@@ -157,7 +157,7 @@ const SignUpNew = () => {
               type="text"
               value={name}
               onChange={handleNameChange}
-              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-opacity-40"
               placeholder="Username"
               required
               autoComplete="off"
@@ -194,7 +194,7 @@ const SignUpNew = () => {
           </label>
           {avatar && (
             <div className="mt-2 flex items-center justify-center">
-              <span className="font-medium text-blue-500">{avatar.name}</span>
+              <span className="font-medium text-purple-800">{avatar.name}</span>
             </div>
           )}
           {avatarError && (
@@ -226,7 +226,7 @@ const SignUpNew = () => {
               value={email}
               onChange={handleEmailChange}
               type="email"
-              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-opacity-40"
               placeholder="Email address"
               required
               autoComplete="off"
@@ -255,7 +255,7 @@ const SignUpNew = () => {
               type="password"
               value={password}
               onChange={handlePasswordChange}
-              className="block w-full rounded-lg border bg-white px-10 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-10 py-3 text-gray-700 focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-opacity-40"
               placeholder="Password"
               required
               autoComplete="off"
@@ -265,7 +265,7 @@ const SignUpNew = () => {
             <button
               disabled={loading}
               type="submit"
-              className={`w-full transform rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white transition-colors duration-300 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 ${
+              className={`w-full transform rounded-lg bg-purple-400 px-6 py-3 text-sm font-medium tracking-wide text-white transition-colors duration-300 hover:bg-purple-500 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-opacity-50 ${
                 loading ? "cursor-not-allowed opacity-50" : ""
               }`}
             >

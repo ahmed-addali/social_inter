@@ -23,11 +23,11 @@ return (
         <hr className="border-t-2 border-gray-300 mb-6" />
         <p className="text-gray-700 mb-6">
           Hello! We've noticed that your post in the{" "}
-          <strong className="text-primary">{communityName}</strong> community may not be the best fit for that audience. However, we believe it would be a great fit for the <strong className="text-primary">{recommendedCommunity}</strong> community!
+          <strong className="text-purple-500">{communityName}</strong> community may not be the best fit for that audience. However, we believe it would be a great fit for the <strong className="text-purple-800">{recommendedCommunity}</strong> community!
         </p>
 
         <button
-          className="bg-primary text-sm hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition-colors duration-300"
+          className="bg-pruple text-sm hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition-colors duration-300"
           onClick={handleClose}
         >
           Got it, thanks!

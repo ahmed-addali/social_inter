@@ -5,7 +5,7 @@ const AccessDenied = () => {
     <section className="bg-white">
       <div className="container flex items-center min-h-screen px-6 py-12 mx-auto">
         <div className="flex flex-col items-center max-w-sm mx-auto text-center">
-          <p className="p-3 text-sm font-medium text-blue-500 rounded-full bg-blue-50">
+          <p className="p-3 text-sm font-medium text-purple-500 rounded-full bg-purple-50">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -28,7 +28,7 @@ const AccessDenied = () => {
             You do not have permission to access this page.
           </p>
           <div className="flex items-center w-full mt-6 gap-x-3 shrink-0 sm:w-auto">
-            <button className="w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto hover:bg-blue-600">
+            <button className="w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-purple-500 rounded-lg shrink-0 sm:w-auto hover:bg-purple-600">
               <Link to="/">Take me home</Link>
             </button>
           </div>

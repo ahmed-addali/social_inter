@@ -65,9 +65,9 @@ const PostView = ({ post, userData }) => {
 
   return (
     <div className="main-section border p-5 bg-white rounded-lg shadow-md">
-      <p className="border border-dashed border-primary cursor-pointer px-2 py-2 w-7 h-7 flex justify-center items-center mb-3 rounded-full">
+      <p className="border border-dashed border-purple-600 cursor-pointer px-2 py-2 w-7 h-7 flex justify-center items-center mb-3 rounded-full">
         <IoIosArrowBack
-          className="text-primary text-lg font-semibold"
+          className="text-purple-600 text-lg font-semibold"
           onClick={() => navigate(location.state?.from || "/")}
         />
       </p>

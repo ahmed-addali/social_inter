@@ -52,7 +52,7 @@ const Rightbar = () => {
     <div className="bg-white rounded-md ">
       <div className="flex flex-col ">
         <h2 className="text-lg font-bold">{name}</h2>
-        <div className="flex items-center gap-2 text-primary mb-4">
+        <div className="flex items-center gap-2 text-purple-600 mb-4">
           <HiUserGroup />
           <span className="mr-2">
             {members?.length || 0}{" "}
@@ -84,7 +84,7 @@ const Rightbar = () => {
         {isModeratorOfThisCommunity && (
           <Link
             to={`/community/${communityName}/moderator`}
-            className="px-4 bg-primary text-white shadow-md shadow-gray-50 text-sm py-1 rounded-md flex justify-center items-center w-full my-2 hover:bg-primary-600"
+            className="px-4 bg-purple-600 text-white shadow-md shadow-gray-50 text-sm py-1 rounded-md flex justify-center items-center w-full my-2 hover:bg-purple-600"
           >
             Moderation Panel
           </Link>

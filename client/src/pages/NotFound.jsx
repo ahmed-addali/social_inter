@@ -7,7 +7,7 @@ const NotFound = () => {
     <section className="bg-white">
       <div className="container mx-auto flex min-h-screen items-center px-6 py-12">
         <div className="mx-auto flex max-w-sm flex-col items-center text-center">
-          <p className="rounded-full bg-blue-50 p-3 text-sm font-medium text-blue-500">
+          <p className="rounded-full bg-purple-50 p-3 text-sm font-medium text-purple-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -47,7 +47,7 @@ const NotFound = () => {
               </svg>
               <span onClick={() => navigate(-1)}>Go back</span>
             </button>
-            <button className="w-1/2 shrink-0 rounded-lg bg-blue-500 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 hover:bg-blue-600 sm:w-auto">
+            <button className="w-1/2 shrink-0 rounded-lg bg-purple-500 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 hover:bg-purple-600 sm:w-auto">
               <Link to="/">Take me home</Link>
             </button>
           </div>

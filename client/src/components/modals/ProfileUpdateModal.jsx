@@ -150,14 +150,14 @@ const ProfileUpdateModal = ({ user, isOpen, onClose }) => {
                       maxLength={50}
                     />
 
-                    <div className="mt-4 h-20 overflow-y-auto">
+                      <div className="mt-4 h-20 overflow-y-auto scroll-custom">
                       <div className="flex flex-wrap gap-2">
                         {suggestedInterests.map((interest, index) => (
                           <button
                             key={index}
                             type="button"
                             disabled={isUpdating || interests.length >= 50}
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                             onClick={() =>
                               setInterests(
                                 interests === ""
@@ -182,7 +182,7 @@ const ProfileUpdateModal = ({ user, isOpen, onClose }) => {
                   className={`inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none sm:ml-3 sm:w-auto sm:text-sm ${
                     isUpdating
                       ? "cursor-not-allowed bg-gray-400"
-                      : "bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      : "bg-purple-500 hover:bg-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                   }`}
                   onClick={handleUpdateProfile}
                 >
@@ -194,7 +194,7 @@ const ProfileUpdateModal = ({ user, isOpen, onClose }) => {
                 </button>
                 <button
                   type="button"
-                  className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm"
                   onClick={onClose}
                 >
                   Cancel

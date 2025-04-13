@@ -79,7 +79,7 @@ const MainSection = () => {
         <li
           className={`${
             activeTab === "All posts"
-              ? "border-blue-500 bg-primary rounded-md text-white"
+              ? "border-purple-500 bg-purple-800 rounded-md text-white"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           } flex-1 cursor-pointer text-center py-2 px-1 border-b-2 font-medium`}
           onClick={() => setActiveTab("All posts")}
@@ -89,7 +89,7 @@ const MainSection = () => {
         <li
           className={`${
             activeTab === "You're following"
-              ? "border-blue-500 bg-primary rounded-md text-white"
+              ? "border-purple-500 bg-purple-800 rounded-md text-white"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           } flex-1 cursor-pointer text-center py-2 px-1 border-b-2 font-medium`}
           onClick={() => setActiveTab("You're following")}
@@ -115,7 +115,7 @@ const MainSection = () => {
             <div>{memoizedCommunityPosts}</div>
             {communityPosts.length < totalCommunityPosts && (
               <button
-                className="bg-primary hover:bg-blue-700 text-sm text-white font-semibold rounded-md w-full p-2 my-3"
+                className="bg-purple-700 hover:bg-purple-600 text-sm text-white font-semibold rounded-md w-full p-2 my-3"
                 onClick={handleLoadMore}
                 disabled={isLoadMoreLoading}
               >

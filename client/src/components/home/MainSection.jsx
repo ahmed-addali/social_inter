@@ -6,13 +6,13 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import Post from "../post/Post";
 import CommonLoading from "../loader/CommonLoading";
-import Home from "../../assets/home.jpg";
+import Home from "../../assets/acceuil.png";
 
 const MemoizedPost = memo(Post);
 
 const LoadMoreButton = ({ onClick, isLoading }) => (
   <button
-    className="bg-primary hover:bg-blue-700 text-sm text-white font-semibold rounded-md w-full p-2 my-3"
+    className="bg-purple-800 hover:bg-purple-700 text-sm text-white font-semibold rounded-md w-full p-2 my-3"
     onClick={onClick}
     disabled={isLoading}
   >
@@ -71,10 +71,11 @@ const MainSection = ({ userData }) => {
       )}
 
       {posts.length === 0 && (
-        <div className="text-center text-gray-700 flex justify-center items-center flex-col">
-          <p className="py-5 font-semibold">
+        <div className="text-center text-gray-400 flex justify-center items-center flex-col">
+          <p className="py-5 font-semibold" style={{marginBottom:"100px"}}>
             No posts to show. Join a community and post something.
           </p>
+          
           <img loading="lazy" src={Home} alt="no post" />
         </div>
       )}

@@ -78,7 +78,7 @@ const Settings = () => {
         <div>Use Perspective API for content moderation</div>
         <div className="ml-auto">
           <input
-            className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             type="checkbox"
             checked={usePerspectiveAPI}
             onChange={(e) => setUsePerspectiveAPI(e.target.checked)}
@@ -90,7 +90,7 @@ const Settings = () => {
         <div>Category filtering service provider</div>
         <div className="ml-auto">
           <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
             value={categoryFilteringServiceProvider}
             onChange={(e) =>
               setCategoryFilteringServiceProvider(e.target.value)
@@ -109,7 +109,7 @@ const Settings = () => {
         <div>Category filtering request timeout (ms)</div>
         <div className="ml-auto">
           <input
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
             type="number"
             value={categoryFilteringRequestTimeout}
             min={0}
@@ -124,7 +124,7 @@ const Settings = () => {
 
       <div className="flex justify-end">
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+          className="bg-purple-500 text-white px-4 py-2 rounded disabled:opacity-50"
           onClick={handleUpdate}
           disabled={isUpdating}
         >

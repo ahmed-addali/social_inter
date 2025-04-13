@@ -77,7 +77,7 @@ const ReportPostModal = ({
               className={`inline-flex justify-center px-4 py-2 text-sm font-medium text-white border rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
                 isLoading || !reportReason
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-primary border-transparent hover:bg-blue-600 focus-visible:ring-blue-500"
+                  : "bg-primary border-transparent hover:bg-primary-600 focus-visible:ring-primary-500"
               }`}
               onClick={handleReportSubmit}
             >
@@ -90,7 +90,7 @@ const ReportPostModal = ({
 
             <button
               type="button"
-              className="inline-flex justify-center px-4 py-2 ml-4 text-sm font-medium text-gray-700 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+              className="inline-flex justify-center px-4 py-2 ml-4 text-sm font-medium text-gray-700 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500"
               onClick={onClose}
             >
               Cancel

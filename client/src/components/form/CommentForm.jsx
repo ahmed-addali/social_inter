@@ -63,7 +63,7 @@ const CommentForm = ({ communityId, postId }) => {
       <form onSubmit={handleSubmit}>
         <div className="my-4">
           <textarea
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 resize-none"
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-purple-500 resize-none"
             name="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -74,7 +74,7 @@ const CommentForm = ({ communityId, postId }) => {
         </div>
         <div className="flex justify-end">
           <button
-            className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-600 focus:outline-none focus:bg-purple-600"
             type="submit"
             disabled={isLoading}
             style={{

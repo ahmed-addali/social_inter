@@ -56,7 +56,7 @@ const VerifyEmail = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-10 overflow-y-auto">
+    <div className="fixed inset-0 z-10 overflow-y-auto scroll-custom">
       <div className="flex min-h-screen items-center justify-center">
         <div className="rounded-md bg-white p-6 shadow-md">
           <h2 className="mb-4 text-2xl font-bold">Verify your email address</h2>
@@ -83,7 +83,7 @@ const VerifyEmail = () => {
           {error && <div className="mb-4 text-sm text-red-500">{error}</div>}
           <button
             disabled={loading}
-            className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            className="rounded-lg bg-purple-500 px-4 py-2 text-white hover:bg-purple-600"
             onClick={handleVerify}
           >
             {loading ? (

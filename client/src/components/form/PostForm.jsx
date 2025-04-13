@@ -225,7 +225,7 @@ const PostForm = ({ communityId, communityName }) => {
         </div>
 
         <button
-          className={`rounded bg-primary px-4 py-1 text-sm text-white hover:bg-blue-700 ${
+          className={`rounded bg-purple-600 px-4 py-1 text-sm text-white hover:bg-purple-700 ${
             formData.loading ? "cursor-not-allowed opacity-50" : ""
           }`}
           type="submit"

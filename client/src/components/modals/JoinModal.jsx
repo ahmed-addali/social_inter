@@ -88,7 +88,7 @@ const JoinModal = memo(({ show, onClose, community }) => {
                 <div className="flex flex-col gap-2 px-4 py-3 sm:flex sm:px-6 md:flex-row md:gap-6">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={onClose}
                     ref={cancelButtonRef}
                     disabled={loading}
@@ -100,8 +100,8 @@ const JoinModal = memo(({ show, onClose, community }) => {
                     type="button"
                     className={`inline-flex justify-center rounded-md border px-4 py-2 text-sm font-medium ${
                       loading
-                        ? "cursor-not-allowed bg-blue-500 text-white"
-                        : "border-transparent bg-blue-500 text-white hover:bg-blue-600"
+                        ? "cursor-not-allowed bg-purple-400 text-white"
+                        : "border-transparent bg-purple-400 text-white hover:bg-purple-600"
                     } focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2`}
                     onClick={() => joinCommunityHandler(community.name)}
                   >
