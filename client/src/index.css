@@ -169,3 +169,34 @@ body {
     transform: translate(-50%, -50%) scale(0);
   }
 }
+.signin-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0px;
+}
+
+.logo {
+  width: 900px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  margin-left: 101px; ;
+  margin-right:99px ;
+}
+.form-container {
+  margin-top: 0;
+}
+
+.scroll-custom {
+  scrollbar-width: auto;
+  scrollbar-color: #830df1 transparent;
+}
+
+
+
+
+

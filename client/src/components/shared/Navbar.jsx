@@ -42,9 +42,9 @@ const Navbar = ({ userData, toggleLeftbar, showLeftbar }) => {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-20 mb-5 flex justify-center gap-10 border bg-white p-2 md:items-center md:justify-between md:px-36">
-      <Link to="/" className="hidden md:inline-block">
-        <img className="w-36" src={Logo} alt="" />
+    <nav className="sticky top-0 z-20 mb-5 flex items-center justify-between border bg-white p-4 md:px-20 scroll-custom">
+    <Link to="/" className="hidden md:inline-block ml-5">
+        <img className="logo" style={{  marginLeft: "auto", width:"150px"}} src={Logo} alt="" />
       </Link>
 
       <button className="inline-block md:hidden" onClick={toggleLeftbar}>
@@ -62,7 +62,7 @@ const Navbar = ({ userData, toggleLeftbar, showLeftbar }) => {
           <img
             src={userData.avatar}
             alt="profile"
-            className="h-8 w-8 rounded-full object-cover"
+            className="h-20 w-20 rounded-full object-cover"
           />
         </button>
         <Transition
@@ -83,11 +83,11 @@ const Navbar = ({ userData, toggleLeftbar, showLeftbar }) => {
               aria-labelledby="user-menu"
             >
               <div className="py-1" role="none">
-                <div className="flex flex-col items-center">
+                <div className="logo">
                   <img
                     src={userData.avatar}
                     alt="profile"
-                    className="mb-2 h-16 w-16 rounded-full object-cover"
+                    className="mb-2 h-16 w-16 rounded-full object-cover logo"
                   />
                   <div className="text-sm font-semibold text-gray-700 hover:underline">
                     <Link to={`/profile`}>{userData.name}</Link>

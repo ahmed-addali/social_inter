@@ -54,7 +54,7 @@ const EligibilityDetectionFailModal = ({
               Discard
             </button>
             <button
-              className={`focus:shadow-outline rounded bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600 focus:outline-none ${
+              className={`focus:shadow-outline rounded bg-purple-500 px-4 py-2 text-sm text-white hover:bg-purple-600 focus:outline-none ${
                 isProcessing ? "cursor-not-allowed opacity-50" : ""
               }`}
               onClick={handleProcess}

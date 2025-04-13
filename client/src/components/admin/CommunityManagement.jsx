@@ -71,7 +71,7 @@ const CommunityManagement = () => {
         <h1 className="text-lg font-bold p-4 text-center border-b-2">
           Communities
         </h1>
-        <div className="flex flex-col overflow-y-auto">
+        <div className="flex flex-col overflow-y-auto scroll-custom">
           {communities.map((community) => (
             <div
               key={community._id}
@@ -153,7 +153,7 @@ const CommunityManagement = () => {
                 <h2 className="font-medium mb-2">Add Moderator</h2>
                 <div className="flex flex-col gap-2 md:flex-row">
                   <select
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 "
                     value={newModerator}
                     onChange={(e) => setNewModerator(e.target.value)}
                   >
@@ -172,7 +172,7 @@ const CommunityManagement = () => {
                         (moderator) => moderator._id === newModerator
                       )
                     }
-                    className={`p-2 bg-blue-500 text-white rounded hover:bg-blue-700 ${
+                    className={`p-2 bg-purple-500 text-white rounded hover:bg-purple-700 ${
                       !newModerator ||
                       isUpdating ||
                       selectedCommunityData.moderators?.find(

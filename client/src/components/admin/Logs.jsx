@@ -72,7 +72,7 @@ const Logs = () => {
               <FcRefresh />
             </button>
             <button
-              className={`bg-blue-500 text-white text-sm py-2 px-4 rounded hover:bg-blue-700 ${
+              className={`bg-purple-500 text-white text-sm py-2 px-4 rounded hover:bg-purple-700 ${
                 clearing ? "opacity-50 cursor-not-allowed" : ""
               } ${logs.length === 0 ? "hidden" : ""}`}
               onClick={handleCleanup}
@@ -92,7 +92,7 @@ const Logs = () => {
             <div className="text-gray-500 text-lg">No logs found</div>
           ) : (
             <>
-              <div className="h-[430px] relative overflow-auto">
+              <div className="h-[430px] relative overflow-auto scroll-custom">
                 <div className="w-full rounded">
                   <div className="grid grid-cols-5 gap-5 items-center border-b py-2 font-semibold text-gray-800">
                     <p className="text-center">Timestamp</p>
@@ -113,7 +113,7 @@ const Logs = () => {
                       <td
                         className={`${
                           log.level === "info"
-                            ? "text-blue-500"
+                            ? "text-purple-500"
                             : log.level === "warn"
                             ? "text-orange-500"
                             : log.level === "error"
@@ -132,7 +132,7 @@ const Logs = () => {
                               ? "bg-red-500 text-white"
                               : log.level === "warn"
                               ? "bg-orange-500 text-white"
-                              : "bg-blue-500 text-white"
+                              : "bg-purple-500 text-white"
                           }`}
                         >
                           {log.level}
@@ -144,7 +144,7 @@ const Logs = () => {
                             Object.entries(log.contextData).map(
                               ([key, value]) => (
                                 <li key={key}>
-                                  <span className="font-medium text-blue-500">
+                                  <span className="font-medium text-purple-500">
                                     {key}:{" "}
                                   </span>
                                   {value}

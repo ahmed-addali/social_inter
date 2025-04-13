@@ -17,7 +17,7 @@ const CommentSidebar = ({ comments }) => {
   };
 
   return (
-    <div className="col-span-1 bg-white sticky top-20 h-[85vh] p-5 rounded-md border overflow-y-auto">
+    <div className="col-span-1 bg-white sticky top-20 h-[85vh] p-5 rounded-md border overflow-y-auto scroll-custom">
       {currentComments.length > 0 && (
         <div>
           <h2 className="font-semibold mb-4 text-center py-2 border-b-2">

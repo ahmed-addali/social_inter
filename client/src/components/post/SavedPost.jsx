@@ -21,9 +21,9 @@ const SavedPost = ({ post }) => {
 
   return (
     <div className="px-6 py-6 rounded-md border bg-white mb-6 w-full">
-      <p className="border border-dashed border-primary cursor-pointer px-2 py-2 w-7 h-7 flex justify-center items-center mb-3 rounded-full">
+      <p className="border border-dashed border-purple-700 cursor-pointer px-2 py-2 w-7 h-7 flex justify-center items-center mb-3 rounded-full">
         <IoIosArrowBack
-          className="text-primary text-xl font-semibold"
+          className="text-purple-600 text-xl font-semibold"
           onClick={handleBack}
         />
       </p>

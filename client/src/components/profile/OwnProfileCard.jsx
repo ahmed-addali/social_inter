@@ -12,6 +12,19 @@ const OwnProfileCard = ({ user }) => {
     setIsModalOpen(true);
   };
 
+  const Tooltip = ({ text, children, className = "" }) => {
+    return (
+      <div className="relative group">
+        {children}
+        <span
+          className={`absolute bottom-full left-1/2 mb-2 w-max -translate-x-1/2 rounded px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition ${className}`}
+        >
+          {text}
+        </span>
+      </div>
+    );
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -22,9 +35,9 @@ const OwnProfileCard = ({ user }) => {
         className="flex cursor-pointer justify-end text-xl"
         onClick={handleOpenModal}
       >
-        <Tooltip text="Edit profile">
-          <CiEdit />
-        </Tooltip>
+      <Tooltip text="Edit profile" className="bg-[#830df1] text-white">
+         <CiEdit />
+      </Tooltip>
       </div>
       <div className="flex flex-col items-center justify-between">
         <div className="flex flex-col items-center justify-center">
@@ -74,7 +87,7 @@ const OwnProfileCard = ({ user }) => {
         )}
       </div>
 
-      <div className="mt-4 h-20 overflow-y-auto">
+      <div className="mt-4 h-20 overflow-y-auto scroll-custom">
         <h3 className="font-bold text-xl mb-2">Interests</h3>
         {user.interests ? (
           <div className="flex flex-wrap gap-2">
@@ -97,7 +110,7 @@ const OwnProfileCard = ({ user }) => {
 
       <span className="mt-3 flex flex-col items-center justify-center border-t">
         <Link
-          className="mt-3 cursor-pointer text-primary hover:underline"
+          className="mt-3 cursor-pointer text-purple-700 hover:underline"
           to="/devices-locations"
         >
           Manage Devices and Locations

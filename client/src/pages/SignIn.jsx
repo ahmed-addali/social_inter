@@ -45,8 +45,8 @@ const SignIn = () => {
     <section className="bg-white">
       <div className="container mx-auto flex min-h-screen flex-col items-center justify-center px-6">
         <form className="w-full max-w-md">
-          <div className="mx-auto flex justify-center">
-            <img className="h-7 w-auto sm:h-8" src={Logo} alt="" />
+          <div className="logo">
+            <img  src={Logo} alt="" />
           </div>
           {signInError && (
             <div
@@ -83,7 +83,7 @@ const SignIn = () => {
           <div className="mt-6 flex items-center justify-center">
             <Link
               to={"/signin"}
-              className="w-1/3 border-b-2 border-blue-500 pb-4 text-center font-medium text-gray-800 "
+              className="w-1/3 border-b-2 border-purple-800 pb-4 text-center font-medium text-gray-800 "
             >
               Sign In
             </Link>
@@ -118,7 +118,7 @@ const SignIn = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-11 py-3 text-gray-700 focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-opacity-40"
               placeholder="Email address"
               required
               autoComplete="off"
@@ -147,7 +147,7 @@ const SignIn = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-lg border bg-white px-10 py-3 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
+              className="block w-full rounded-lg border bg-white px-10 py-3 text-gray-700 focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-opacity-40"
               placeholder="Password"
               required
               autoComplete="off"
@@ -157,7 +157,7 @@ const SignIn = () => {
             <button
               disabled={loading}
               onClick={handleSubmit}
-              className={`w-full transform rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white transition-colors duration-300 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 ${
+              className={`w-full transform rounded-lg bg-purple-500 px-6 py-3 text-sm font-medium tracking-wide text-white transition-colors duration-300 hover:bg-purple-800 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-opacity-50 ${
                 loading ? "cursor-not-allowed opacity-50" : ""
               }`}
             >
@@ -174,14 +174,14 @@ const SignIn = () => {
             href="https://github.com/nz-m/SocialInter"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center hover:text-blue-500"
+            className="flex items-center hover:text-purple-500"
           >
             <AiFillGithub className="mr-2 h-5 w-5" />
             <span>GitHub</span>
           </a>
           <Link
             to="/admin"
-            className="ml-8 flex items-center hover:text-blue-500"
+            className="ml-8 flex items-center hover:text-purple-500"
           >
             <MdOutlineAdminPanelSettings className="mr-2 h-5 w-5" />
             <span>Admin</span>

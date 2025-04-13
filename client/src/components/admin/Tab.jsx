@@ -27,7 +27,7 @@ const Tab = ({ activeTab, handleTabClick }) => {
           <span
             className={`cursor-pointer inline-flex items-center px-2 py-2 border-b-2 rounded-t-lg ${
               activeTab === "logs"
-                ? "border-blue-500 bg-primary rounded-md text-white"
+                ? "border-purple-500 bg-purple-500 rounded-md text-white"
                 : "border-transparent hover:text-gray-600 hover:border-gray-300"
             }`}
             onClick={() => handleTabClick("logs")}
@@ -40,7 +40,7 @@ const Tab = ({ activeTab, handleTabClick }) => {
           <span
             className={`cursor-pointer inline-flex items-center px-2 py-2 border-b-2 rounded-t-lg ${
               activeTab === "settings"
-                ? "border-blue-500 bg-primary rounded-md text-white"
+                ? "border-purple-500 bg-purple-500 rounded-md text-white"
                 : "border-transparent hover:text-gray-600 hover:border-gray-300"
             }`}
             onClick={() => handleTabClick("settings")}
@@ -53,7 +53,7 @@ const Tab = ({ activeTab, handleTabClick }) => {
           <span
             className={`cursor-pointer inline-flex items-center px-2 py-2 border-b-2 rounded-t-lg ${
               activeTab === "Community Management"
-                ? "border-blue-500 bg-primary rounded-md text-white"
+                ? "border-purple-500 bg-purple-500 rounded-md text-white"
                 : "border-transparent hover:text-gray-600 hover:border-gray-300"
             }`}
             onClick={() => handleTabClick("Community Management")}
@@ -66,7 +66,7 @@ const Tab = ({ activeTab, handleTabClick }) => {
           <span
             className={`cursor-pointer inline-flex items-center px-2 py-2 border-b-2 rounded-t-md ${
               activeTab === "logout"
-                ? "border-blue-500 bg-primary rounded-md text-white"
+                ? "border-purple-500 bg-purple-500 rounded-md text-white"
                 : "border-transparent hover:text-red-600 hover:border-red-600"
             }`}
             onClick={handleLogout}
