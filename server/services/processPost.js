@@ -55,13 +55,13 @@ const getSystemPreferences = async () => {
     if (!config) {
       return {
         serviceProvider: "disabled",
-        timeout: 10000,
+        timeout: 30000,
       };
     }
 
     const {
       categoryFilteringServiceProvider: serviceProvider = "disabled",
-      categoryFilteringRequestTimeout: timeout = 10000,
+      categoryFilteringRequestTimeout: timeout = 30000,
     } = config;
 
     return {
@@ -71,7 +71,7 @@ const getSystemPreferences = async () => {
   } catch (error) {
     return {
       serviceProvider: "disabled",
-      timeout: 10000,
+      timeout: 30000,
     };
   }
 };

@@ -26,10 +26,17 @@ const adminSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (value) {
-          return value.length >= 6;
+          // Check the password value before it gets hashed
+          return (
+            value.length >= 8 && 
+            /[A-Z]/.test(value) && 
+            /[a-z]/.test(value) && 
+            /[0-9]/.test(value) && 
+            /[!@#$%^&*(),.?":{}|<>]/.test(value)
+          );
         },
         message: function (props) {
-          return "Password must be at least 6 characters long!";
+          return "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character!";
         },
       },
     },

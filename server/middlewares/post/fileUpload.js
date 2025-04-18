@@ -1,22 +1,25 @@
 const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 function fileUpload(req, res, next) {
-  const up_folder = path.join(__dirname, "../../assets/userFiles");
-
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      if (!fs.existsSync(up_folder)) {
-        fs.mkdirSync(up_folder, { recursive: true });
-      }
-      cb(null, up_folder);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const ext = path.extname(file.originalname);
-      cb(null, file.fieldname + "-" + uniqueSuffix + ext);
-    },
+  // Use CloudinaryStorage instead of diskStorage
+  const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'socialecho/posts',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'mp4', 'webm', 'mov'],
+      resource_type: 'auto' // Auto-detect whether it's an image or video
+    }
   });
 
   const upload = multer({
@@ -50,9 +53,8 @@ function fileUpload(req, res, next) {
     }
 
     const file = req.files[0];
-    const fileUrl = `${req.protocol}://${req.get("host")}/assets/userFiles/${
-      file.filename
-    }`;
+    // Use the Cloudinary URL directly
+    const fileUrl = file.path; // Cloudinary URL is stored in path by multer-storage-cloudinary
 
     req.file = file;
     req.fileUrl = fileUrl;

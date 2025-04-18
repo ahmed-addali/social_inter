@@ -1,21 +1,25 @@
 const fs = require("fs");
-function avatarUpload(req, res, next) {
-  const multer = require("multer");
-  const path = require("path");
-  const up_folder = path.join(__dirname, "../../assets/userAvatars");
+const multer = require("multer");
+const path = require("path");
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      if (!fs.existsSync(up_folder)) {
-        fs.mkdirSync(up_folder, { recursive: true });
-      }
-      cb(null, up_folder);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const ext = path.extname(file.originalname);
-      cb(null, file.fieldname + "-" + uniqueSuffix + ext);
-    },
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+function avatarUpload(req, res, next) {
+  // Use CloudinaryStorage instead of diskStorage
+  const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'socialecho/avatars',
+      allowed_formats: ['jpg', 'jpeg', 'png'],
+      transformation: [{ width: 500, height: 500, crop: 'limit' }]
+    }
   });
 
   const upload = multer({
@@ -44,6 +48,12 @@ function avatarUpload(req, res, next) {
         error: err.message,
       });
     } else {
+      // Adjust the file URL to use Cloudinary URL instead of local path
+      if (req.files && req.files.length > 0) {
+        req.files.forEach(file => {
+          file.cloudinaryUrl = file.path; // Cloudinary URL is stored in path by multer-storage-cloudinary
+        });
+      }
       next();
     }
   });
