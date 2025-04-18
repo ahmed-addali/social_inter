@@ -292,14 +292,14 @@ const addUser = async (req, res, next) => {
 
   const defaultAvatar =
     "https://raw.githubusercontent.com/nz-m/public-files/main/dp.jpg";
-  const fileUrl = req.files?.[0]?.filename
-    ? `${req.protocol}://${req.get("host")}/assets/userAvatars/${
-        req.files[0].filename
-      }`
+    
+  // Get Cloudinary URL if avatar was uploaded
+  const fileUrl = req.files && req.files.length > 0
+    ? req.files[0].path // Cloudinary URL is stored in the path property
     : defaultAvatar;
 
   const emailDomain = req.body.email.split("@")[1];
-  const role = emailDomain === "mod.socialinter.com" ? "moderator" : "general";
+  const role = emailDomain === "moderator.com" ? "moderator" : "general";
 
   newUser = new User({
     name: req.body.name,
