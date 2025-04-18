@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+// Ensure there's no trailing slash in the base URL
+const BASE_URL = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL.replace(/\/$/, '') : 'https://social-inter-ugp4.vercel.app';
 const ADMIN_URL = `${BASE_URL}/admin`;
 
 const authInterceptor = (req) => {
