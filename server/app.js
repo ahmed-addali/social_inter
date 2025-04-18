@@ -35,7 +35,14 @@ db.connect().catch((err) =>
   console.error("Error connecting to database:", err)
 );
 
-app.use(cors());
+// Update CORS configuration to allow requests from your frontend
+app.use(cors({
+  origin: ['https://social-inter.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(morgan("dev"));
 app.use("/assets/userFiles", express.static(__dirname + "/assets/userFiles"));
 app.use(
@@ -47,6 +54,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 require("./config/passport.js");
+
+// Handle OPTIONS preflight requests
+app.options('*', (req, res) => {
+  res.status(200).end();
+});
 
 app.get("/server-status", (req, res) => {
   res.status(200).json({ message: "Server is up and running!" });
