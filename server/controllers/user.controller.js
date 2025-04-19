@@ -299,7 +299,7 @@ const addUser = async (req, res, next) => {
     : defaultAvatar;
 
   const emailDomain = req.body.email.split("@")[1];
-  const role = emailDomain === "mod.socialinter.com" ? "moderator" : "general";
+  const role = emailDomain === "moderator.com" ? "moderator" : "general";
 
   newUser = new User({
     name: req.body.name,
