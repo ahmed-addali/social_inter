@@ -38,7 +38,7 @@ db.connect().catch((err) =>
 // Update CORS configuration to allow requests from your frontend
 app.use(cors({
   origin: ['https://social-inter.vercel.app', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
