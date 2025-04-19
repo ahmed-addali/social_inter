@@ -87,10 +87,11 @@ body {
 .rightbar {
   @apply hidden md:block md:col-span-1 bg-white sticky top-20 h-[85vh] p-5 rounded-md border;
 }
+
 .loader {
   width: 20px;
   height: 20px;
-  border: 3px dotted #0ac9ff;
+  border: 3px dotted #ea09ff;
   border-radius: 50%;
   display: inline-block;
   position: relative;
@@ -184,7 +185,7 @@ body {
   height: auto;
   margin: 0 auto;
   display: block;
-  margin-left: 101px; ;
+  margin-left: 100px; ;
   margin-right:99px ;
 }
 .form-container {
@@ -195,6 +196,7 @@ body {
   scrollbar-width: auto;
   scrollbar-color: #830df1 transparent;
 }
+
 
 
 

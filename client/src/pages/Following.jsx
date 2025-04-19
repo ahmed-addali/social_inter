@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getFollowingUsersAction } from "../redux/actions/userActions";
 import PublicProfileCard from "../components/profile/PublicProfileCard";
 import CommonLoading from "../components/loader/CommonLoading";
-import noFollow from "../assets/nofollow.jpg";
+import noFollow from "../assets/nofollow.png";
 
 const Following = () => {
   const dispatch = useDispatch();

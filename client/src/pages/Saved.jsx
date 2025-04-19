@@ -2,7 +2,7 @@ import { getSavedPostsAction } from "../redux/actions/postActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import SavedPost from "../components/post/SavedPost";
-import NoSavedPost from "../assets/nopost.jpg";
+import NoSavedPost from "../assets/nopost.png";
 
 const Saved = () => {
   const dispatch = useDispatch();

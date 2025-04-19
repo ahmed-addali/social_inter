@@ -42,7 +42,7 @@ const Navbar = ({ userData, toggleLeftbar, showLeftbar }) => {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-20 mb-5 flex items-center justify-between border bg-white p-4 md:px-20 scroll-custom">
+    <nav className="sticky top-0 z-20 mb-5 flex items-center justify-start gap-x-28 border bg-white p-4 md:px-20 scroll-custom">
     <Link to="/" className="hidden md:inline-block ml-5">
         <img className="logo" style={{  marginLeft: "auto", width:"150px"}} src={Logo} alt="" />
       </Link>
@@ -56,7 +56,7 @@ const Navbar = ({ userData, toggleLeftbar, showLeftbar }) => {
       <div className="relative flex justify-end md:w-36">
         <button
           type="button"
-          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full"
+          className="inline-flex h-10 w-13 cursor-pointer items-center justify-center rounded-full"
           onClick={handleProfileClick}
         >
           <img
@@ -83,17 +83,18 @@ const Navbar = ({ userData, toggleLeftbar, showLeftbar }) => {
               aria-labelledby="user-menu"
             >
               <div className="py-1" role="none">
-                <div className="logo">
+                <div className=" flex justify-center">
                   <img
                     src={userData.avatar}
                     alt="profile"
-                    className="mb-2 h-16 w-16 rounded-full object-cover logo"
-                  />
-                  <div className="text-sm font-semibold text-gray-700 hover:underline">
+                    className="mb-2 h-20 w-20 rounded-full object-cover center "
+                  /></div>
+                  <div>
+                  <div className="text-sm font-semibold text-gray-600 hover:underline" style={{marginLeft: "25px"}}>
                     <Link to={`/profile`}>{userData.name}</Link>
                   </div>
-                  <div className="text-sm text-gray-500">{userData.email}</div>
-                </div>
+                  <div className="text-sm text-gray-500" style={{marginLeft: "25px"}}>{userData.email}</div>
+                  </div>
                 <hr className="my-2" />
                 <div className="flex justify-center">
                   <button

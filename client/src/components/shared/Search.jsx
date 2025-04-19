@@ -89,7 +89,7 @@ const Search = () => {
           value={inputValue}
           onChange={handleInputChange}
           placeholder="Search for people, posts or communities"
-          className="h-10 py-1 bg-white border w-full md:w-[660px] rounded-full text-sm shadow-sm focus:outline-none focus:shadow-outline-purple focus:border-purple-500 transition duration-300 pl-3 pr-10"
+          className="h-10 py-1 bg-white border w-full md:w-[670px] rounded-full text-sm shadow-sm focus:outline-none focus:shadow-outline-purple focus:border-purple-500 transition duration-300 pl-3 pr-10 center"
           aria-label="Search"
           autoComplete="off"
         />
