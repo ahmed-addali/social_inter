@@ -89,3 +89,31 @@ export const removeModerator = async (communityId, moderatorId) => {
     return handleApiError(error);
   }
 };
+
+// New API methods for community management
+export const createCommunity = async (communityData) => {
+  try {
+    const res = await ADMIN_API.post("/community", communityData);
+    return { error: null, data: res.data };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const updateCommunity = async (communityId, communityData) => {
+  try {
+    const res = await ADMIN_API.put(`/community/${communityId}`, communityData);
+    return { error: null, data: res.data };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const deleteCommunity = async (communityId) => {
+  try {
+    await ADMIN_API.delete(`/community/${communityId}`);
+    return { error: null };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};

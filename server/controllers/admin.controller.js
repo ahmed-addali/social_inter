@@ -285,6 +285,118 @@ const removeModerator = async (req, res) => {
   }
 };
 
+/**
+ * @route POST /admin/community
+ * @description Create a new community
+ */
+const createCommunity = async (req, res) => {
+  try {
+    const { name, description, banner } = req.body;
+    
+    // Validate required fields
+    if (!name || !description) {
+      return res.status(400).json({ message: "Name and description are required" });
+    }
+    
+    // Check if community with the same name already exists
+    const existingCommunity = await Community.findOne({ name });
+    if (existingCommunity) {
+      return res.status(400).json({ message: "A community with this name already exists" });
+    }
+    
+    // Set default banner if not provided
+    const defaultBanner = banner || "https://via.placeholder.com/150";
+    
+    // Create new community
+    const newCommunity = new Community({
+      name,
+      description,
+      banner: defaultBanner,
+      moderators: [],
+      members: [],
+      posts: [],
+      rules: []
+    });
+    
+    await newCommunity.save();
+    
+    res.status(201).json({ 
+      message: "Community created successfully", 
+      community: newCommunity 
+    });
+  } catch (error) {
+    console.error("Error creating community:", error);
+    res.status(500).json({ message: "Error creating community" });
+  }
+};
+
+/**
+ * @route PUT /admin/community/:communityId
+ * @description Update an existing community
+ */
+const updateCommunity = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+    const { name, description, banner } = req.body;
+    
+    // Find community
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+    
+    // Check if another community with the same name already exists
+    if (name && name !== community.name) {
+      const existingCommunity = await Community.findOne({ name });
+      if (existingCommunity) {
+        return res.status(400).json({ message: "A community with this name already exists" });
+      }
+    }
+    
+    // Update fields if provided
+    if (name) community.name = name;
+    if (description) community.description = description;
+    if (banner) community.banner = banner;
+    
+    await community.save();
+    
+    res.status(200).json({ 
+      message: "Community updated successfully", 
+      community 
+    });
+  } catch (error) {
+    console.error("Error updating community:", error);
+    res.status(500).json({ message: "Error updating community" });
+  }
+};
+
+/**
+ * @route DELETE /admin/community/:communityId
+ * @description Delete a community
+ */
+const deleteCommunity = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+    
+    // Find and delete community
+    const community = await Community.findByIdAndDelete(communityId);
+    
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+    
+    // Additional cleanup might be needed here, such as:
+    // - Removing community posts
+    // - Updating user membership references
+    // This depends on your data model and relationships
+    
+    res.status(200).json({ message: "Community deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting community:", error);
+    res.status(500).json({ message: "Error deleting community" });
+  }
+};
+
 module.exports = {
   retrieveServicePreference,
   updateServicePreference,
@@ -296,4 +408,7 @@ module.exports = {
   addModerator,
   removeModerator,
   getModerators,
+  createCommunity,
+  updateCommunity,
+  deleteCommunity,
 };
