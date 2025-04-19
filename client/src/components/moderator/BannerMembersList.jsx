@@ -70,7 +70,7 @@ const BannerMembersList = () => {
                   onClick={() => {
                     toggleUnbanUserModal(bannedMember._id, true);
                   }}
-                  className="ml-2 bg-primary hover:bg-sky-700 text-white font-bold rounded-lg px-4 py-2 h-9 flex justify-center items-center text-sm"
+                  className="ml-2 bg-purple-600 hover:bg-sky-700 text-white font-bold rounded-lg px-4 py-2 h-9 flex justify-center items-center text-sm"
                 >
                   Unban user
                 </button>
