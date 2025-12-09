@@ -8,7 +8,7 @@
     "start": "nodemon app.js",
     "production": "node app.js"
   },
-  "author": "Neaz",
+  "author": "ahmed",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.4.0",
