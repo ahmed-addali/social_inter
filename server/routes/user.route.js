@@ -6,6 +6,7 @@ const requestIp = require("request-ip");
 const {
   addUser,
   signin,
+  demoSignin,
   logout,
   refreshToken,
   getModProfile,
@@ -56,6 +57,7 @@ router.post(
   sendVerificationEmail
 );
 router.post("/refresh-token", refreshToken);
+router.post("/demo-signin", demoSignin);
 router.post(
   "/signin",
   signUpSignInLimiter,

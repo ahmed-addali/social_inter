@@ -121,6 +121,38 @@ export const signInAction = (formData, navigate) => async (dispatch) => {
   }
 };
 
+export const demoSignInAction = (navigate) => async (dispatch) => {
+  try {
+    const response = await api.demoSignIn();
+    const { error, data } = response;
+    if (error) {
+      dispatch({
+        type: types.SIGNIN_FAIL,
+        payload: error,
+      });
+    } else {
+      const { user, accessToken, refreshToken, accessTokenUpdatedAt } = data;
+      const profile = {
+        user,
+        accessToken,
+        refreshToken,
+        accessTokenUpdatedAt,
+      };
+      localStorage.setItem("profile", JSON.stringify(profile));
+      dispatch({
+        type: types.SIGNIN_SUCCESS,
+        payload: profile,
+      });
+      navigate("/");
+    }
+  } catch (error) {
+    await dispatch({
+      type: types.SIGNIN_FAIL,
+      payload: "Demo signin failed. Please ensure the demo user is set up.",
+    });
+  }
+};
+
 export const getModProfileAction = () => async (dispatch) => {
   try {
     const { error, data } = await api.getModProfile();

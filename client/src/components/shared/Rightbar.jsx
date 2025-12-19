@@ -22,8 +22,18 @@ const Rightbar = () => {
   const currentUser = useSelector((state) => state.auth?.userData);
 
   const recommendedUsers = useSelector((state) => state.user?.publicUsers);
+  // Show only demo/fake users in suggestions (emails created by demo script start with "demo_user")
+  // Also exclude the current user from the suggestions
+  const demoRecommendedUsers = (recommendedUsers || []).filter(
+    (u) =>
+      u?.email &&
+      u.email.toLowerCase().startsWith("demo_user") &&
+      u._id !== currentUser?._id
+  );
 
   useEffect(() => {
+    if (!currentUser) return;
+    
     const fetchData = async () => {
       await dispatch(getNotJoinedCommunitiesAction());
       setNotJoinedCommunitiesFetched(true);
@@ -33,15 +43,19 @@ const Rightbar = () => {
     fetchData().then(() => {
       setPublicUsersFetched(true);
     });
-  }, [dispatch]);
+  }, [dispatch, currentUser]);
 
   const notJoinedCommunities = useSelector(
     (state) => state.community?.notJoinedCommunities
   );
 
   const [visibleCommunities, remainingCount] = useMemo(() => {
-    const visibleCommunities = notJoinedCommunities?.slice(0, 4) || [];
-    const remainingCount = Math.max((notJoinedCommunities?.length || 0) - 4, 0);
+    // Show only demo communities (created by demo script with name prefix "Demo -")
+    const demoNotJoined = (notJoinedCommunities || []).filter((c) =>
+      c?.name?.toLowerCase().startsWith("demo -")
+    );
+    const visibleCommunities = demoNotJoined.slice(0, 4) || [];
+    const remainingCount = Math.max((demoNotJoined.length || 0) - 4, 0);
     return [visibleCommunities, remainingCount];
   }, [notJoinedCommunities]);
 
@@ -147,14 +161,14 @@ const Rightbar = () => {
       <hr className="my-3" />
       <h5 className="mb-4 text-sm font-semibold">Popular Users to Follow</h5>
 
-      {publicUsersFetched && recommendedUsers?.length === 0 && (
+      {publicUsersFetched && demoRecommendedUsers?.length === 0 && (
         <div className="text-center italic text-gray-400">
           No users to follow. Check back later
         </div>
       )}
       <ul className="flex flex-col gap-3">
-        {recommendedUsers?.length > 0 &&
-          recommendedUsers.map((user) => (
+        {demoRecommendedUsers?.length > 0 &&
+          demoRecommendedUsers.map((user) => (
             <li
               key={user._id}
               className="flex justify-between items-center gap-5 bg-white shadow-2xl shadow-[#f2f5fc]  border border-slate-100 px-2 py-1 rounded-lg"

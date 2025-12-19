@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
-    "production": "node app.js"
+    "production": "node app.js",
+    "setup-demo": "node scripts/create-demo-user.js",
+    "create-admin": "node scripts/create-admin.js"
   },
   "author": "ahmed",
   "license": "ISC",

@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import createAppStore from "./redux/store";
 import axios from "axios";
 import CommonLoading from "./components/loader/CommonLoading";
+import DemoBanner from "./components/shared/DemoBanner";
 import App from "./App";
 import { getTitleFromRoute } from "./utils/docTitle";
 import { Helmet } from "react-helmet";
@@ -63,6 +64,7 @@ const AppContainer = () => {
       <Helmet>
         <title>{getTitleFromRoute(location.pathname)}</title>
       </Helmet>
+      <DemoBanner />
       <App />
     </Provider>
   );

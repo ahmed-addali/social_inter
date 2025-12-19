@@ -207,6 +207,76 @@ const signin = async (req, res, next) => {
 };
 
 /**
+ * Demo signin - Allows users to try the platform without registration
+ * Automatically logs in as the demo user
+ */
+const demoSignin = async (req, res) => {
+  try {
+    // Find the demo user
+    const demoUser = await User.findOne({ email: "demo@socialecho.com" });
+
+    if (!demoUser) {
+      return res.status(404).json({
+        message: "Demo user not found. Please run the setup script first.",
+      });
+    }
+
+    // Generate tokens for demo user
+    const payload = {
+      id: demoUser._id,
+      email: demoUser.email,
+    };
+
+    const accessToken = jwt.sign(payload, process.env.SECRET, {
+      expiresIn: "6h",
+    });
+
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // Store refresh token
+    const newRefreshToken = new Token({
+      user: demoUser._id,
+      refreshToken,
+      accessToken,
+    });
+    await newRefreshToken.save();
+
+    await saveLogInfo(
+      req,
+      "Demo user signed in",
+      LOG_TYPE.SIGN_IN,
+      LEVEL.INFO
+    );
+
+    res.status(200).json({
+      accessToken,
+      refreshToken,
+      accessTokenUpdatedAt: new Date().toLocaleString(),
+      user: {
+        _id: demoUser._id,
+        name: demoUser.name,
+        email: demoUser.email,
+        role: demoUser.role,
+        avatar: demoUser.avatar,
+      },
+    });
+  } catch (error) {
+    await saveLogInfo(
+      req,
+      "Demo signin error: " + error.message,
+      LOG_TYPE.SIGN_IN,
+      LEVEL.ERROR
+    );
+
+    res.status(500).json({
+      message: "Something went wrong with demo signin",
+    });
+  }
+};
+
+/**
  * Retrieves a user's profile information, including their total number of posts,
  * the number of communities they are in, the number of communities they have posted in,
  * and their duration on the platform.
@@ -462,6 +532,7 @@ const updateInfo = async (req, res) => {
 module.exports = {
   addUser,
   signin,
+  demoSignin,
   logout,
   refreshToken,
   getModProfile,

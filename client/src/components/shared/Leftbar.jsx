@@ -20,8 +20,10 @@ const Leftbar = ({ showLeftbar }) => {
   );
 
   useEffect(() => {
-    dispatch(getJoinedCommunitiesAction());
-  }, [dispatch]);
+    if (user) {
+      dispatch(getJoinedCommunitiesAction());
+    }
+  }, [dispatch, user]);
 
   const visibleCommunities = useMemo(() => {
     return joinedCommunities?.slice(0, 5);
@@ -86,8 +88,7 @@ const Leftbar = ({ showLeftbar }) => {
                 >
                   See all
                   <p className="absolute -top-2 -right-4 text-white text-xs bg-purple-500 w-4 h-4 rounded-full flex justify-center items-center">
-                    {" "}
-                    {joinedCommunities.length}
+                    {joinedCommunities?.length || 0}
                   </p>
                 </Link>
               </div>
